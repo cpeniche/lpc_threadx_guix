@@ -54,12 +54,14 @@ $(LIBDIR)/libtx.a : $(obj-tx) $(asm-tx)
 #common threadx files
 $(OBJDIR)/$(THREADX_DIR)/%.o: $(AZURE_DIR)/$(THREADX_DIR)/common/src/%.c
 	@echo "compiling: $<"
-	$(Q)$(CC) -c $(CFLAGS) $< -I$(AZURE_DIR)/$(THREADX_DIR)/common/inc -I$(AZURE_DIR)/$(THREADX_DIR)/$(arch_cpu)/inc -o $@
+	$(Q)$(CC) -c $(CFLAGS) $< -I$(AZURE_DIR)/$(THREADX_DIR)/common/inc \
+	                          -I$(AZURE_DIR)/$(THREADX_DIR)/$(arch_cpu)/inc -o $@
 
 #port asm files
 $(OBJDIR)/$(THREADX_DIR)/%.o: $(AZURE_DIR)/$(THREADX_DIR)/$(arch_cpu)/src/%.S 
 	@echo "compiling: $<"
-	$(Q)$(CC) -c $(CFLAGS) $< -I$(AZURE_DIR)/$(THREADX_DIR)/common/inc -I$(AZURE_DIR)/$(THREADX_DIR)/$(arch_cpu)/inc -o $@
+	$(Q)$(CC) -c $(CFLAGS) $< -I$(AZURE_DIR)/$(THREADX_DIR)/common/inc \
+	                          -I$(AZURE_DIR)/$(THREADX_DIR)/$(arch_cpu)/inc -o $@
 
 
 
