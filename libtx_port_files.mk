@@ -1,0 +1,10 @@
+asm-tx += tx_thread_context_restore.o
+asm-tx += tx_thread_context_restore.o
+asm-tx += tx_thread_context_save.o
+asm-tx += tx_thread_interrupt_control.o
+asm-tx += tx_thread_interrupt_disable.o
+asm-tx += tx_thread_interrupt_restore.o
+asm-tx += tx_thread_schedule.o
+asm-tx += tx_thread_stack_build.o
+asm-tx += tx_thread_system_return.o
+asm-tx += tx_timer_interrupt.o
