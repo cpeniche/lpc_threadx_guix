@@ -21,11 +21,21 @@ Q = @
 LIBDIR ?= /home/carlo/temp/build
 OBJDIR ?= /home/carlo/temp/build/obj
 
+INCLUDES = -I$(AZURE_DIR)/$(THREADX_DIR)/common/inc -I$(AZURE_DIR)/$(THREADX_DIR)/$(arch_cpu)/inc
+INCLUDES += -I$(AZURE_DIR)/$(THREADX_DIR)/common/inc -I$(AZURE_DIR)/$(THREADX_DIR)/$(arch_cpu)/inc
+INCLUDES += -I$(AZURE_DIR)/$(GUIX_DIR)/common/inc -I$(AZURE_DIR)/$(GUIX_DIR)/$(arch_cpu)/inc
+
 obj-tx ?=
 asm-tx ?=
 obj-gx ?=
 asm-gx ?=
 
+
+
+VPATH = $(OBJDIR)
+VPATH += $(OBJDIR)/threadx
+
+#$(info $(VPATH))
 
 ifeq ("$(origin V)", "command line")
   VERBOSE = $(V)
@@ -43,16 +53,15 @@ endif
 ifeq ($(MAKECMDGOALS),libtx)
 include sources.mk
 include libtx_port_files.mk
-# append directories to the obj-tx list and asm-tx list
-  obj-tx := $(addprefix $(OBJDIR)/$(THREADX_DIR)/,$(obj-tx))
-  asm-tx := $(addprefix $(OBJDIR)/$(THREADX_DIR)/,$(asm-tx))
+VPATH += $(HOME)/projects/Azure/$(THREADX_DIR)/common/src
+VPATH += $(HOME)/projects/Azure/$(THREADX_DIR)/$(arch_cpu)/src
+$(shell mkdir -p $(OBJDIR)/$(THREADX_DIR))
 endif
 
 ifeq ($(MAKECMDGOALS),libgx)
 include sources.mk
 include libtx_port_files.mk
-# append directories to the obj-gx list
-  obj-gx := $(addprefix $(OBJDIR)/$(GUIX_DIR)/,$(obj-gx))  
+VPATH += $(HOME)/projects/Azure/$(GUIX_DIR)/common/src
 endif
 
 libtx : $(LIBDIR)/libtx.a
@@ -61,50 +70,45 @@ libtx : $(LIBDIR)/libtx.a
 $(LIBDIR)/libtx.a : $(obj-tx) $(asm-tx)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GNU Arm Cross Archiver'
-	$(Q)$(AR) -r $@ $(obj-tx) $(asm-tx)
+	$(Q)$(AR) -r $@ $(addprefix $(OBJDIR)/$(THREADX_DIR)/,$(obj-tx)) $(addprefix $(OBJDIR)/$(THREADX_DIR)/,$(asm-tx))
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 #common threadx files
-$(OBJDIR)/$(THREADX_DIR)/%.o: $(AZURE_DIR)/$(THREADX_DIR)/common/src/%.c
+$(obj-tx): %.o : %.c
 	@echo "[CC]: $<"
-	$(Q)$(CC) -c $(CFLAGS) $< -I$(AZURE_DIR)/$(THREADX_DIR)/common/inc -I$(AZURE_DIR)/$(THREADX_DIR)/$(arch_cpu)/inc -o $@
+	$(Q)$(CC) -c $(CFLAGS) $< $(INCLUDES) -o $(OBJDIR)/$(THREADX_DIR)/$@
 
 #port asm files
-$(OBJDIR)/$(THREADX_DIR)/%.o: $(AZURE_DIR)/$(THREADX_DIR)/$(arch_cpu)/src/%.S 
+$(asm-tx): %.o : %.S 
 	@echo "[CC]: $<"
-	$(Q)$(CC) -c $(CFLAGS) $< -I$(AZURE_DIR)/$(THREADX_DIR)/common/inc -I$(AZURE_DIR)/$(THREADX_DIR)/$(arch_cpu)/inc -o $@
+	$(Q)$(CC) -c $(CFLAGS) $< $(INCLUDES) -o $(OBJDIR)/$(THREADX_DIR)/$@
 
+-include $(obj-tx:%.o=%.d)
+-include $(asm-tx:%.o=%.d)
+
+%.d: %.c
+	$(Q)$(CC) -MM -MF$(OBJDIR)/$(THREADX_DIR)/$@ $(CFLAGS) $(INCLUDES) $<
+
+
+#sed 's,\($*\).o[ :]*,\1.o $@ : ,g' < $(OBJDIR)/$(THREADX_DIR)/$@.$$$$ > $(OBJDIR)/$(THREADX_DIR)/$@; \
+#rm -f $(OBJDIR)/$(THREADX_DIR)/$@.$$$$
 
 ######  Compile GUIX Library ############
 
 libgx : $(LIBDIR)/libgx.a
 
-
 $(LIBDIR)/libgx.a : $(obj-gx) 
 	@echo 'Building target: $@'
 	@echo 'Invoking: GNU Arm Cross Archiver'
-	$(Q)$(AR) -r $@ $(obj-gx) 
+	$(Q)$(AR) -r $@ $(addprefix $(OBJDIR)/$(GUIX_DIR)/,$(obj-gx))
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 #common Guix files
-$(OBJDIR)/$(GUIX_DIR)/%.o: $(AZURE_DIR)/$(GUIX_DIR)/common/src/%.c                         
-	@echo "[CC]: $<"
-	$(Q)$(CC) -c $(CFLAGS) $< -I$(AZURE_DIR)/$(GUIX_DIR)/common/inc -I$(AZURE_DIR)/$(GUIX_DIR)/$(arch_cpu)/inc \
-                              -I$(AZURE_DIR)/$(THREADX_DIR)/common/inc -I$(AZURE_DIR)/$(THREADX_DIR)/$(arch_cpu)/inc -o $@
+$(obj-gx): %.o : %.c                         
+	@echo "[CC]: $<" 
+	$(Q)$(CC) -c $(CFLAGS) $< $(INCLUDES) -o $(OBJDIR)/$(GUIX_DIR)/$@
 	
-#crate threadx output directory
-$(obj-tx) $(asm-tx) : | $(OBJDIR)/$(THREADX_DIR)
-
-$(OBJDIR)/$(THREADX_DIR) :
-	mkdir -p $(OBJDIR)/$(THREADX_DIR)
-	
-#create guix output directory
-$(obj-gx) : | $(OBJDIR)/$(GUIX_DIR)
-
-$(OBJDIR)/$(GUIX_DIR) :
-	mkdir -p $(OBJDIR)/$(GUIX_DIR)
-
 clean:	
 	rm -rf $(LIBDIR)

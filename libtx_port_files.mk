@@ -1,5 +1,4 @@
 asm-tx += tx_thread_context_restore.o
-asm-tx += tx_thread_context_restore.o
 asm-tx += tx_thread_context_save.o
 asm-tx += tx_thread_interrupt_control.o
 asm-tx += tx_thread_interrupt_disable.o
