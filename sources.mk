@@ -1,11 +1,9 @@
-obj-tx ?=
-asm-tx ?=
-obj-obj-gx += gx ?=
-asm-obj-gx += gx ?=
+obj-tx :=
+asm-tx :=
+obj-gx :=
 
 
-ifeq ($(COMPILE_TX),y)
-
+ifeq ($(MAKECMDGOALS),libtx)
 obj-tx += tx_block_allocate.o
 obj-tx += tx_block_pool_cleanup.o
 obj-tx += tx_block_pool_create.o
@@ -197,7 +195,7 @@ obj-tx += txe_timer_info_get.o
 endif
 endif
 
-ifeq ($(COMPILE_GX),y)
+ifeq ($(MAKECMDGOALS),libgx)
 
 obj-gx += gx_accordion_menu_create.o
 obj-gx += gx_accordion_menu_draw.o
