@@ -18,8 +18,8 @@ FILEX_DIR = filex
 COMPILE_GX ?=
 COMPILE_TX ?=
 Q = @
-LIBDIR ?= /home/carlo/temp/build
-OBJDIR ?= /home/carlo/temp/build/obj
+LIBDIR ?= $(CURDIR)/build
+OBJDIR ?= $(LIBDIR)/obj
 
 INCLUDES = -I$(AZURE_DIR)/$(THREADX_DIR)/common/inc -I$(AZURE_DIR)/$(THREADX_DIR)/$(arch_cpu)/inc
 INCLUDES += -I$(AZURE_DIR)/$(THREADX_DIR)/common/inc -I$(AZURE_DIR)/$(THREADX_DIR)/$(arch_cpu)/inc
@@ -30,8 +30,7 @@ asm-tx ?=
 obj-gx ?=
 asm-gx ?=
 
-
-
+vpath %.d $(OBJDIR)/threadx
 VPATH = $(OBJDIR)
 VPATH += $(OBJDIR)/threadx
 
@@ -84,15 +83,15 @@ $(asm-tx): %.o : %.S
 	@echo "[CC]: $<"
 	$(Q)$(CC) -c $(CFLAGS) $< $(INCLUDES) -o $(OBJDIR)/$(THREADX_DIR)/$@
 
+#-include $(addprefix $(OBJDIR)/$(THREADX_DIR)/,$(obj-tx:%.o=%.d))
+#-include $(addprefix $(OBJDIR)/$(THREADX_DIR)/,$(asm-tx:%.o=%.d))
+
 -include $(obj-tx:%.o=%.d)
--include $(asm-tx:%.o=%.d)
-
 %.d: %.c
-	$(Q)$(CC) -MM -MF$(OBJDIR)/$(THREADX_DIR)/$@ $(CFLAGS) $(INCLUDES) $<
-
-
-#sed 's,\($*\).o[ :]*,\1.o $@ : ,g' < $(OBJDIR)/$(THREADX_DIR)/$@.$$$$ > $(OBJDIR)/$(THREADX_DIR)/$@; \
-#rm -f $(OBJDIR)/$(THREADX_DIR)/$@.$$$$
+	@echo "building dependency file : $@"
+	$(Q)$(CC) -MM $(CFLAGS) $(INCLUDES) $< > $(OBJDIR)/$(THREADX_DIR)/$@.$$$$; \
+	sed 's,\($*\).o[ :]*,\1.o $@ : ,g' < $(OBJDIR)/$(THREADX_DIR)/$@.$$$$ > $(OBJDIR)/$(THREADX_DIR)/$@; \
+	rm -f $(OBJDIR)/$(THREADX_DIR)/$@.$$$$
 
 ######  Compile GUIX Library ############
 
