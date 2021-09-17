@@ -30,11 +30,7 @@ asm-tx ?=
 obj-gx ?=
 asm-gx ?=
 
-vpath %.d $(OBJDIR)/threadx
-VPATH = $(OBJDIR)
-VPATH += $(OBJDIR)/threadx
-
-#$(info $(VPATH))
+VPATH = $(OBJDIR)/$(THREADX_DIR)
 
 ifeq ("$(origin V)", "command line")
   VERBOSE = $(V)
@@ -49,6 +45,8 @@ else
   Q = @
 endif
 
+#$(info $(.SUFFIXES))
+
 ifeq ($(MAKECMDGOALS),libtx)
 include sources.mk
 include libtx_port_files.mk
@@ -59,8 +57,10 @@ endif
 
 ifeq ($(MAKECMDGOALS),libgx)
 include sources.mk
-include libtx_port_files.mk
 VPATH += $(HOME)/projects/Azure/$(GUIX_DIR)/common/src
+VPATH += $(HOME)/projects/Azure/$(THREADX_DIR)/common/src
+VPATH += $(HOME)/projects/Azure/$(THREADX_DIR)/$(arch_cpu)/src
+$(shell mkdir -p $(OBJDIR)/$(GUIX_DIR))
 endif
 
 libtx : $(LIBDIR)/libtx.a
@@ -74,24 +74,28 @@ $(LIBDIR)/libtx.a : $(obj-tx) $(asm-tx)
 	@echo ' '
 
 #common threadx files
-$(obj-tx): %.o : %.c
+$(OBJDIR)/$(THREADX_DIR)/%.o : %.c
 	@echo "[CC]: $<"
-	$(Q)$(CC) -c $(CFLAGS) $< $(INCLUDES) -o $(OBJDIR)/$(THREADX_DIR)/$@
+	$(Q)$(CC) -c $(CFLAGS) $< $(INCLUDES) -o $@
 
 #port asm files
-$(asm-tx): %.o : %.S 
+$(OBJDIR)/$(THREADX_DIR)/%.o : %.S 
 	@echo "[CC]: $<"
-	$(Q)$(CC) -c $(CFLAGS) $< $(INCLUDES) -o $(OBJDIR)/$(THREADX_DIR)/$@
+	$(Q)$(CC) -c $(CFLAGS) $< $(INCLUDES) -o $@
 
-#-include $(addprefix $(OBJDIR)/$(THREADX_DIR)/,$(obj-tx:%.o=%.d))
-#-include $(addprefix $(OBJDIR)/$(THREADX_DIR)/,$(asm-tx:%.o=%.d))
+-include $(addprefix $(OBJDIR)/$(THREADX_DIR)/,$(obj-tx:%.o=%.d))
 
--include $(obj-tx:%.o=%.d)
-%.d: %.c
+$(OBJDIR)/$(THREADX_DIR)/%.d: %.c
 	@echo "building dependency file : $@"
-	$(Q)$(CC) -MM $(CFLAGS) $(INCLUDES) $< > $(OBJDIR)/$(THREADX_DIR)/$@.$$$$; \
-	sed 's,\($*\).o[ :]*,\1.o $@ : ,g' < $(OBJDIR)/$(THREADX_DIR)/$@.$$$$ > $(OBJDIR)/$(THREADX_DIR)/$@; \
-	rm -f $(OBJDIR)/$(THREADX_DIR)/$@.$$$$
+	$(Q)$(CC) -MM -MT$@ -MT$(@:%.d=%.o) $(CFLAGS) $(INCLUDES) $< > $@ \
+
+-include $(addprefix $(OBJDIR)/$(THREADX_DIR)/,$(asm-tx:%.o=%.d))
+
+$(OBJDIR)/$(THREADX_DIR)/%.d: %.S
+	@echo "building dependency file : $@"
+	$(Q)$(CC) -MM -MT$@ -MT$(@:%.d=%.o) $(CFLAGS) $(INCLUDES) $< > $@ \
+
+
 
 ######  Compile GUIX Library ############
 
@@ -105,9 +109,15 @@ $(LIBDIR)/libgx.a : $(obj-gx)
 	@echo ' '
 
 #common Guix files
-$(obj-gx): %.o : %.c                         
-	@echo "[CC]: $<" 
-	$(Q)$(CC) -c $(CFLAGS) $< $(INCLUDES) -o $(OBJDIR)/$(GUIX_DIR)/$@
+$(OBJDIR)/$(GUIX_DIR)/%.o : %.c
+	@echo "[CC]: $<"
+	$(Q)$(CC) -c $(CFLAGS) $< $(INCLUDES) -o $@
+
+-include $(addprefix $(OBJDIR)/$(GUIX_DIR)/,$(obj-gx:%.o=%.d))
+
+$(OBJDIR)/$(GUIX_DIR)/%.d: %.c
+	@echo "building dependency file : $@"
+	$(Q)$(CC) -MM -MT$@ -MT$(@:%.d=%.o) $(CFLAGS) $(INCLUDES) $< > $@ \
 	
 clean:	
 	rm -rf $(LIBDIR)
