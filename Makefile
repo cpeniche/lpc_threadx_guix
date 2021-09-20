@@ -21,16 +21,14 @@ Q = @
 LIBDIR ?= $(CURDIR)/build
 OBJDIR ?= $(LIBDIR)/obj
 
+.SUFFIXES:
+
 INCLUDES = -I$(AZURE_DIR)/$(THREADX_DIR)/common/inc -I$(AZURE_DIR)/$(THREADX_DIR)/$(arch_cpu)/inc
 INCLUDES += -I$(AZURE_DIR)/$(THREADX_DIR)/common/inc -I$(AZURE_DIR)/$(THREADX_DIR)/$(arch_cpu)/inc
 INCLUDES += -I$(AZURE_DIR)/$(GUIX_DIR)/common/inc -I$(AZURE_DIR)/$(GUIX_DIR)/$(arch_cpu)/inc
 
-obj-tx ?=
-asm-tx ?=
-obj-gx ?=
-asm-gx ?=
-
-VPATH = $(OBJDIR)/$(THREADX_DIR)
+VPATH += $(OBJDIR)/$(THREADX_DIR)
+VPATH += $(OBJDIR)/$(GUIX_DIR)
 
 ifeq ("$(origin V)", "command line")
   VERBOSE = $(V)
@@ -45,9 +43,8 @@ else
   Q = @
 endif
 
-#$(info $(.SUFFIXES))
-
 ifeq ($(MAKECMDGOALS),libtx)
+$(info Entering libtx)
 include sources.mk
 include libtx_port_files.mk
 VPATH += $(HOME)/projects/Azure/$(THREADX_DIR)/common/src
@@ -57,19 +54,44 @@ endif
 
 ifeq ($(MAKECMDGOALS),libgx)
 include sources.mk
-VPATH += $(HOME)/projects/Azure/$(GUIX_DIR)/common/src
 VPATH += $(HOME)/projects/Azure/$(THREADX_DIR)/common/src
 VPATH += $(HOME)/projects/Azure/$(THREADX_DIR)/$(arch_cpu)/src
+VPATH += $(HOME)/projects/Azure/$(GUIX_DIR)/common/src
 $(shell mkdir -p $(OBJDIR)/$(GUIX_DIR))
 endif
 
-libtx : $(LIBDIR)/libtx.a
+######  Compile GUIX Library ############
 
-######  Compile THREADX Library #######
-$(LIBDIR)/libtx.a : $(obj-tx) $(asm-tx)
+libgx : $(LIBDIR)/libgx.a
+
+$(LIBDIR)/libgx.a : $(addprefix $(OBJDIR)/$(GUIX_DIR)/,$(obj-gx))
 	@echo 'Building target: $@'
 	@echo 'Invoking: GNU Arm Cross Archiver'
-	$(Q)$(AR) -r $@ $(addprefix $(OBJDIR)/$(THREADX_DIR)/,$(obj-tx)) $(addprefix $(OBJDIR)/$(THREADX_DIR)/,$(asm-tx))
+	$(Q)$(AR) -r $@ $?
+	@echo 'Finished building target: $@'
+	@echo ' '
+
+#common Guix files
+$(OBJDIR)/$(GUIX_DIR)/%.o : %.c
+	@echo "[CC]: $<"
+	$(Q)$(CC) -c $(CFLAGS) $< $(INCLUDES) -o $@
+
+-include $(addprefix $(OBJDIR)/$(GUIX_DIR)/,$(obj-gx:%.o=%.d))
+
+
+$(OBJDIR)/$(GUIX_DIR)/%.d : %.c
+	@echo "building dependency file : $@"
+	$(Q)$(CC) -MM -MT$@ -MT$(@:%.d=%.o) $(CFLAGS) $(INCLUDES) $< > $@
+
+
+######  Compile THREADX Library #######
+
+libtx : $(LIBDIR)/libtx.a
+
+$(LIBDIR)/libtx.a : $(addprefix $(OBJDIR)/$(THREADX_DIR)/,$(obj-tx)) $(addprefix $(OBJDIR)/$(THREADX_DIR)/,$(asm-tx))
+	@echo 'Building target: $@'
+	@echo 'Invoking: GNU Arm Cross Archiver'
+	$(Q)$(AR) -r $@ $? 
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -95,29 +117,6 @@ $(OBJDIR)/$(THREADX_DIR)/%.d: %.S
 	@echo "building dependency file : $@"
 	$(Q)$(CC) -MM -MT$@ -MT$(@:%.d=%.o) $(CFLAGS) $(INCLUDES) $< > $@ \
 
-
-
-######  Compile GUIX Library ############
-
-libgx : $(LIBDIR)/libgx.a
-
-$(LIBDIR)/libgx.a : $(obj-gx) 
-	@echo 'Building target: $@'
-	@echo 'Invoking: GNU Arm Cross Archiver'
-	$(Q)$(AR) -r $@ $(addprefix $(OBJDIR)/$(GUIX_DIR)/,$(obj-gx))
-	@echo 'Finished building target: $@'
-	@echo ' '
-
-#common Guix files
-$(OBJDIR)/$(GUIX_DIR)/%.o : %.c
-	@echo "[CC]: $<"
-	$(Q)$(CC) -c $(CFLAGS) $< $(INCLUDES) -o $@
-
--include $(addprefix $(OBJDIR)/$(GUIX_DIR)/,$(obj-gx:%.o=%.d))
-
-$(OBJDIR)/$(GUIX_DIR)/%.d: %.c
-	@echo "building dependency file : $@"
-	$(Q)$(CC) -MM -MT$@ -MT$(@:%.d=%.o) $(CFLAGS) $(INCLUDES) $< > $@ \
 	
 clean:	
 	rm -rf $(LIBDIR)
