@@ -3,7 +3,7 @@ asm-tx :=
 obj-gx :=
 
 
-ifeq ($(MAKECMDGOALS),libtx)
+ifeq ($(findstring libtx,$(MAKECMDGOALS)),libtx)
 obj-tx += tx_block_allocate.o
 obj-tx += tx_block_pool_cleanup.o
 obj-tx += tx_block_pool_create.o
@@ -195,7 +195,7 @@ obj-tx += txe_timer_info_get.o
 endif
 endif
 
-ifeq ($(MAKECMDGOALS),libgx)
+ifeq ($(findstring libgx,$(MAKECMDGOALS)),libgx)
 
 obj-gx += gx_accordion_menu_create.o
 obj-gx += gx_accordion_menu_draw.o
@@ -1509,4 +1509,39 @@ obj-gx += gx_window_view_update_detect.o
 obj-gx += gx_window_wallpaper_get.o
 obj-gx += gx_window_wallpaper_set.o
 
+endif
+
+ifeq ($(findstring liblpc,$(MAKECMDGOALS)),liblpc)
+obj-lpc += adc_17xx_40xx.o
+obj-lpc += can_17xx_40xx.o
+obj-lpc += chip_17xx_40xx.o
+obj-lpc += clock_17xx_40xx.o
+obj-lpc += cmp_17xx_40xx.o
+obj-lpc += crc_17xx_40xx.o
+obj-lpc += dac_17xx_40xx.o
+obj-lpc += eeprom_17xx_40xx.o
+obj-lpc += emc_17xx_40xx.o
+obj-lpc += enet_17xx_40xx.o
+obj-lpc += gpdma_17xx_40xx.o
+obj-lpc += gpio_17xx_40xx.o
+obj-lpc += gpioint_17xx_40xx.o
+obj-lpc += i2c_17xx_40xx.o
+obj-lpc += i2s_17xx_40xx.o
+obj-lpc += iap.o
+obj-lpc += iocon_17xx_40xx.o
+obj-lpc += lcd_17xx_40xx.o
+obj-lpc += pmu_17xx_40xx.o
+obj-lpc += ring_buffer.o
+obj-lpc += ritimer_17xx_40xx.o
+obj-lpc += rtc_17xx_40xx.o
+obj-lpc += sdc_17xx_40xx.o
+obj-lpc += sdmmc_17xx_40xx.o
+obj-lpc += spi_17xx_40xx.o
+obj-lpc += ssp_17xx_40xx.o
+obj-lpc += stopwatch_17xx_40xx.o
+obj-lpc += sysctl_17xx_40xx.o
+obj-lpc += sysinit_17xx_40xx.o
+obj-lpc += timer_17xx_40xx.o
+obj-lpc += uart_17xx_40xx.o
+obj-lpc += wwdt_17xx_40xx.o
 endif
