@@ -3,11 +3,12 @@ export CROSS_COMPILE ?= arm-none-eabi-
 export CC := $(CROSS_COMPILE)gcc	
 export CPP := $(CROSS_COMPILE)g++	
 export CPU := cortex_m3
+export APPDIR := application
 TOOL := gnu
 AR := $(CROSS_COMPILE)ar
 export CFLAGS := -mcpu=cortex-m3 -march=armv7-m -mthumb -O0 \
 		   -fmessage-length=0 -fsigned-char -ffunction-sections \
-		   -fdata-sections -g3 -DCORE_M3
+		   -fdata-sections -g3 -DCORE_M3 -D__NO_SYSTEM_INIT
 export arch_cpu := ports/$(CPU)/$(TOOL)
 
 #Extract threadx directory
@@ -77,7 +78,7 @@ $(shell mkdir -p $(OBJDIR)/$(LPC_DIR))
 endif
 
 app: 
-	$(Q)$(MAKE) -C  ./Application
+	$(Q)$(MAKE) -C  ./$(APPDIR)
 
 ######  Compile GUIX Library ############
 

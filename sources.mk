@@ -129,8 +129,6 @@ obj-tx += tx_trace_isr_exit_insert.o
 obj-tx += tx_trace_object_register.o
 obj-tx += tx_trace_object_unregister.o
 obj-tx += tx_trace_user_event_insert.o
-
-ifeq ($(MODULES),y)
 obj-tx += txe_block_allocate.o
 obj-tx += txe_block_pool_create.o
 obj-tx += txe_block_pool_delete.o
@@ -191,8 +189,6 @@ obj-tx += txe_timer_create.o
 obj-tx += txe_timer_deactivate.o
 obj-tx += txe_timer_delete.o
 obj-tx += txe_timer_info_get.o
-
-endif
 endif
 
 ifeq ($(findstring libgx,$(MAKECMDGOALS)),libgx)
