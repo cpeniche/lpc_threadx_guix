@@ -12,7 +12,7 @@ export CFLAGS := -mcpu=cortex-m3 -march=armv7-m -mthumb -O0 \
 export arch_cpu := ports/$(CPU)/$(TOOL)
 
 #Extract threadx directory
-AZURE_DIR = $(CURDIR)/lib/Azure
+export AZURE_DIR ?= /home/carlo/projects/Azure
 THREADX_DIR = threadx
 GUIX_DIR = guix
 USBX_DIR = usbx
@@ -51,15 +51,6 @@ export Q
 export VERBOSE
 export INCLUDES
 
-ifeq ($(findstring libgx,$(MAKECMDGOALS)),libgx)
-include sources.mk
-VPATH += $(HOME)/projects/Azure/$(THREADX_DIR)/common/src
-VPATH += $(HOME)/projects/Azure/$(THREADX_DIR)/$(arch_cpu)/src
-VPATH += $(HOME)/projects/Azure/$(GUIX_DIR)/common/src
-$(shell mkdir -p $(OBJDIR)/$(GUIX_DIR))
-endif
-
-
 ifeq ($(findstring liblpc,$(MAKECMDGOALS)),liblpc)
 include sources.mk
 VPATH += $(CURDIR)/$(LPC_DIR)/src
@@ -73,24 +64,8 @@ app:
 
 ######  Compile GUIX Library ############
 
-libgx : $(LIBDIR)/libgx.a
-
-$(LIBDIR)/libgx.a : $(addprefix $(OBJDIR)/$(GUIX_DIR)/,$(obj-gx))
-	@echo 'Building target: $@'
-	@echo 'Invoking: GNU Arm Cross Archiver'
-	$(Q)$(AR) -r $@ $?
-	@echo 'Finished building target: $@'
-	@echo ' '
-
-#common Guix files
-$(OBJDIR)/$(GUIX_DIR)/%.o : %.c
-	$(Q)$(call compile,$(CC),$<,$@)
-	
--include $(addprefix $(OBJDIR)/$(GUIX_DIR)/,$(obj-gx:%.o=%.d))
-
-$(OBJDIR)/$(GUIX_DIR)/%.d : %.c
-	$(Q)$(call dependencies,$@,$(@:%.d=%.o))
-
+libgx : 
+	$(Q)$(MAKE) -C ./lib/Azure/guix
 
 ######  Compile THREADX Library #######
 
@@ -120,4 +95,12 @@ $(OBJDIR)/$(LPC_DIR)/%.d: %.c
 .phony: libtx libgx liblpc
 
 clean:	
-	rm -rf $(LIBDIR)
+	$(Q)rm -rf $(LIBDIR)
+
+#remove the build directories and the threadx source links
+commit :
+	$(Q)rm -rf $(LIBDIR)
+	$(Q)$(PROGDIR)/scripts/create_links.sh del $(CURDIR)/lib/Azure/threadx
+
+src_tree :
+	$(Q)$(PROGDIR)/scripts/create_links.sh create $(CURDIR)/lib/Azure/guix

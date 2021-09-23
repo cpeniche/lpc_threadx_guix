@@ -7,6 +7,8 @@ include ./ports/$(ARCH)/$(TOOL)/Makefile
 include $(PROGDIR)/defines.mk
 
 obj_dir := threadx/obj
+src_tree = "common/inc common/src common_modules/inc common_modules/module_lib/src common_modules/module_manager/inc \
+            common_modules/module_manager/src ports/$(ARCH)/$(TOOL)/src ports/$(ARCH)/$(TOOL)/inc"
 
 # c compiler flags for cortex m3 processor
 ifeq ($(ARCH),cortex_m3)
@@ -26,7 +28,7 @@ VPATH += $(CURDIR)/ports/$(ARCH)/$(TOOL)/src
 INCLUDES =  -I$(CURDIR)/common/inc -I$(CURDIR)/ports/$(ARCH)/$(TOOL)/inc
 
 #check if Azure source file exists if not create link
-$(shell $(PROGDIR)/scripts/create_links.sh $(CURDIR))
+$(shell $(PROGDIR)/scripts/create_links.sh add $(CURDIR) $(AZURE_DIR)/threadx $(src_tree))
 
 $(LIBDIR)/threadx/libtx.a : $(addprefix $(BUILDDIR)/$(obj_dir)/,$(obj-tx)) $(addprefix $(BUILDDIR)/$(obj_dir)/,$(asm-tx))
 	@echo 'Building target: $@'
@@ -47,7 +49,6 @@ $(BUILDDIR)/$(obj_dir)/%.o : %.S
 
 $(BUILDDIR)/$(obj_dir)/%.d: %.c
 	$(Q)$(call dependencies,$@,$(@:%.d=%.o))
-
 
 -include $(addprefix $(BUILDDIR)/$(obj_dir)/,$(asm-tx:%.o=%.d))
 
