@@ -101,6 +101,7 @@ clean:
 commit :
 	$(Q)rm -rf $(LIBDIR)
 	$(Q)$(PROGDIR)/scripts/create_links.sh del $(CURDIR)/lib/Azure/threadx
+	$(Q)$(PROGDIR)/scripts/create_links.sh del $(CURDIR)/lib/Azure/guix
 
 src_tree :
 	$(Q)$(PROGDIR)/scripts/create_links.sh create $(CURDIR)/lib/Azure/guix
