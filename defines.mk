@@ -6,6 +6,6 @@ define dependencies
 endef
 
 define compile
-  echo "[CC]: $(notdir $(2))";\
+  echo "[CC] $(notdir $(2))";\
   $(1) -c $(CFLAGS) $(2) $(INCLUDES) -o $(3)
 endef

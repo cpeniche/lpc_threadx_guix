@@ -65,12 +65,12 @@ app:
 ######  Compile GUIX Library ############
 
 libgx : 
-	$(Q)$(MAKE) -C ./lib/Azure/guix
+	$(Q)$(MAKE) build -C ./lib/Azure/guix
 
 ######  Compile THREADX Library #######
 
 libtx: 
-	$(Q)$(MAKE) -C ./lib/Azure/threadx	
+	$(Q)$(MAKE) build -C ./lib/Azure/threadx	
 
 ####-------------------------------------###
 
@@ -100,7 +100,8 @@ clean:
 #remove the build directories and the threadx source links
 commit :
 	$(Q)rm -rf $(LIBDIR)
-	$(Q)$(PROGDIR)/scripts/create_links.sh del $(CURDIR)/lib/Azure/threadx
+	$(Q)$(MAKE) $@ -C ./lib/Azure/threadx
+	$(Q)$(MAKE) $@ -C ./lib/Azure/guix
 
 src_tree :
-	$(Q)$(PROGDIR)/scripts/create_links.sh create $(CURDIR)/lib/Azure/guix
+	$(Q)$(MAKE) $@ -C ./lib/Azure/guix 
