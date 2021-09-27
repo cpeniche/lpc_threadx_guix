@@ -6,17 +6,17 @@ project_dir=$2
 
 if [ $1 == add ]; then
   for path in ${src_tree[@]}
-  do  
-    if [ -z "$(ls -A $project_dir/$path)" ]; then    
-      ln -s $threadx_main_dir/${path}/* $project_dir/${path}/
-    fi
+  do      
+    ln -sf $threadx_main_dir/${path}/* $project_dir/${path}/    
   done
 fi
 
 if [ $1 == del ]; then
   for path in ${src_tree[@]}
   do 
-    rm -f $project_dir/${path}/*
+    rm -f $project_dir/${path}/*.c
+    rm -f $project_dir/${path}/*.h
+    rm -f $project_dir/${path}/*.S
   done
 fi
 

@@ -2,9 +2,10 @@
 ARCH ?= cortex_m3
 TOOL ?= gnu
 
-include ./common/Makefile
-include ./ports/$(ARCH)/$(TOOL)/Makefile
-include $(PROGDIR)/defines.mk
+-include ./common/src/Makefile
+-include ./ports/$(ARCH)/$(TOOL)/src/Makefile
+-include $(PROGDIR)/scripts/defines.mk
+
 
 obj_dir := threadx/obj
 src_tree = "common/inc common/src common_modules/inc common_modules/module_lib/src common_modules/module_manager/inc \
@@ -29,6 +30,7 @@ ifeq ($(findstring build,$(MAKECMDGOALS)), build)
   $(shell $(PROGDIR)/scripts/create_links.sh add $(CURDIR) $(AZURE_DIR)/threadx $(src_tree))
 endif
 
+
 build: $(LIBDIR)/threadx/libtx.a
 
 $(LIBDIR)/threadx/libtx.a : $(addprefix $(BUILDDIR)/$(obj_dir)/,$(obj-tx)) $(addprefix $(BUILDDIR)/$(obj_dir)/,$(asm-tx))
@@ -39,8 +41,11 @@ $(LIBDIR)/threadx/libtx.a : $(addprefix $(BUILDDIR)/$(obj_dir)/,$(obj-tx)) $(add
 	@echo ' '
 
 #common threadx files
-$(BUILDDIR)/$(obj_dir)/%.o : %.c
-	$(Q)$(call compile,$(CC),$<,$@)
+#$(BUILDDIR)/$(obj_dir)/%.o : %.c
+#	$(Q)$(call compile,$(CC),$<,$@)
+
+$(BUILDDIR)/$(obj_dir)%.o :
+	$(Q)$(MAKE) -f $(PROGDIR)/scripts/Makefile.build obj=$(dir $@)
 
 #port asm files
 $(BUILDDIR)/$(obj_dir)/%.o : %.S 

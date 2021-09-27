@@ -1,0 +1,8 @@
+
+app:  $(obj)%.o:
+
+$(info obj value : $(obj))
+
+#common threadx files
+$(obj)%.o: %.c
+    $(Q)$(call compile,$(CC),$<,$@)
