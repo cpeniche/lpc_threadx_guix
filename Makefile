@@ -1,6 +1,3 @@
-
-
-
 export CROSS_COMPILE ?= arm-none-eabi-
 export CC := $(CROSS_COMPILE)gcc	
 export CPP := $(CROSS_COMPILE)g++	
@@ -36,7 +33,7 @@ VPATH += $(OBJDIR)/$(THREADX_DIR)
 VPATH += $(OBJDIR)/$(GUIX_DIR)
 VPATH += $(OBJDIR)/$(LPC_DIR)
 
--include ./scripts/defines.mk
+-include ./scripts/Makefile.include
 
 ifeq ("$(origin V)", "command line")
   VERBOSE = $(V)
@@ -61,10 +58,16 @@ VPATH += $(CURDIR)/$(LPC_DIR)/src
 $(shell mkdir -p $(OBJDIR)/$(LPC_DIR))
 endif
 
-#$(info $(VPATH))
+built-in := ./application/built-in.o
+built-libs := $(PROGDIR)/lib/Azure/threadx/libtx.a $(PROGDIR)/lib/Azure/guix/guix.a $(PROGDIR)/lib/lpc_chip_177x_8x/lpc.a
 
-app: 
-	$(Q)$(MAKE) -C  ./$(APPDIR)
+
+app.elf : $(built-libs)
+	$(Q)$(CPP) $^ -T $(cmd_file) $(LINKER_FLAGS) -L$(LIBDIR) -o$@ $(addprefix -l,$(LIBS))
+
+
+$(built-libs):
+	$(Q)$(MAKE) $(build)=$(patsubst %/,%,$(dir $@))
 
 ######  Compile GUIX Library ############
 

@@ -1,8 +1,34 @@
 
-app:  $(obj)%.o:
 
-$(info obj value : $(obj))
+src := $(obj)
 
-#common threadx files
-$(obj)%.o: %.c
-    $(Q)$(call compile,$(CC),$<,$@)
+PHONY := __build
+__build:
+
+obj-y :=
+lib-y :=
+
+include $(PROGDIR)/scripts/Makefile.include
+include $(src)/Makefile
+include $(PROGDIR)/scripts/Makefile.lib
+
+__build: $(subdir-y)
+	@:
+
+# Descending
+# ---------------------------------------------------------------------------
+PHONY += $(subdir-y)
+$(subdir-y):
+	$(Q)$(MAKE) $(build)=$@
+	
+# Add FORCE to the prequisites of a target to force it to be always rebuilt.
+# ---------------------------------------------------------------------------
+
+PHONY += FORCE
+
+FORCE:
+
+
+
+
+
