@@ -1,15 +1,16 @@
-
 export CROSS_COMPILE ?= arm-none-eabi-
 export CC := $(CROSS_COMPILE)gcc	
 export CPP := $(CROSS_COMPILE)g++	
-export CPU := cortex_m3
+export ARCH ?= cortex_m3
 export APPDIR := application
-TOOL := gnu
+export TOOL ?= gnu
+
+
 AR := $(CROSS_COMPILE)ar
 export CFLAGS := -mcpu=cortex-m3 -march=armv7-m -mthumb -O0 \
 		   -fmessage-length=0 -fsigned-char -ffunction-sections \
 		   -fdata-sections -g3 -DCORE_M3 -D__NO_SYSTEM_INIT
-export arch_cpu := ports/$(CPU)/$(TOOL)
+
 
 #Extract threadx directory
 export AZURE_DIR ?= /home/carlo/projects/Azure
@@ -32,7 +33,7 @@ VPATH += $(OBJDIR)/$(THREADX_DIR)
 VPATH += $(OBJDIR)/$(GUIX_DIR)
 VPATH += $(OBJDIR)/$(LPC_DIR)
 
--include defines.mk
+-include ./scripts/Makefile.include
 
 ifeq ("$(origin V)", "command line")
   VERBOSE = $(V)
@@ -57,20 +58,26 @@ VPATH += $(CURDIR)/$(LPC_DIR)/src
 $(shell mkdir -p $(OBJDIR)/$(LPC_DIR))
 endif
 
-#$(info $(VPATH))
+built-in := ./application/built-in.o
+built-libs := $(PROGDIR)/lib/Azure/threadx/libtx.a $(PROGDIR)/lib/Azure/guix/guix.a $(PROGDIR)/lib/lpc_chip_177x_8x/lpc.a
 
-app: 
-	$(Q)$(MAKE) -C  ./$(APPDIR)
+
+app.elf : $(built-libs)
+	$(Q)$(CPP) $^ -T $(cmd_file) $(LINKER_FLAGS) -L$(LIBDIR) -o$@ $(addprefix -l,$(LIBS))
+
+
+$(built-libs):
+	$(Q)$(MAKE) $(build)=$(patsubst %/,%,$(dir $@))
 
 ######  Compile GUIX Library ############
 
 libgx : 
-	$(Q)$(MAKE) -C ./lib/Azure/guix
+	$(Q)$(MAKE) build -C ./lib/Azure/guix
 
 ######  Compile THREADX Library #######
 
 libtx: 
-	$(Q)$(MAKE) -C ./lib/Azure/threadx	
+	$(Q)$(MAKE) build -C ./lib/Azure/threadx	
 
 ####-------------------------------------###
 
@@ -100,8 +107,8 @@ clean:
 #remove the build directories and the threadx source links
 commit :
 	$(Q)rm -rf $(LIBDIR)
-	$(Q)$(PROGDIR)/scripts/create_links.sh del $(CURDIR)/lib/Azure/threadx
-	$(Q)$(PROGDIR)/scripts/create_links.sh del $(CURDIR)/lib/Azure/guix
+	$(Q)$(MAKE) $@ -C ./lib/Azure/threadx
+	$(Q)$(MAKE) $@ -C ./lib/Azure/guix
 
 src_tree :
-	$(Q)$(PROGDIR)/scripts/create_links.sh create $(CURDIR)/lib/Azure/guix
+	$(Q)$(MAKE) $@ -C ./lib/Azure/guix 

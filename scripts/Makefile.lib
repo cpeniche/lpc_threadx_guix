@@ -1,0 +1,8 @@
+
+
+subdir-y := $(patsubst %/,%, $(obj-y))
+obj-y := $(filter-out %/, $(obj-y))
+
+$(obj)/%.o : %.c FORCE
+	$(Q)$(call compile,$(CC),$<,$@)	
+    
