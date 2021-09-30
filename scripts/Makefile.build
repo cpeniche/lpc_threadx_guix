@@ -12,18 +12,33 @@ include $(build-dir)/Makefile
 include $(PROGDIR)/scripts/Makefile.include
 include $(PROGDIR)/scripts/Makefile.lib
 
+subdir-builtin := $(sort $(filter %/built-in.a, $(real-obj-y)))
 
-$(obj)/%.o : %.c FORCE
+# Build the compiled-in targets
+# ---------------------------------------------------------------------------
+$(subdir-builtin): $(obj)/%/built-in.a: $(obj)/% ;
+
+ifdef need-builtin
+targets-for-builtin += $(obj)/built-in.a
+endif
+
+
+$(obj)/%.o : %(src)/%.c FORCE
 	$(Q)$(call compile,$(CC),$<,$@)	
 
-__build: $(subdir-y)
+$(obj)/built-in.a: $(real-obj-y) FORCE
+	echo building archive
+
+__build: $(if $(BUILD_BUILTIN), $(targets-for-builtin)) \
+		 $(subdir-y)
 	@:
 
 # Descending
 # ---------------------------------------------------------------------------
 PHONY += $(subdir-y)
 $(subdir-y):	
-	$(Q)$(MAKE) $(build)=$@
+	$(Q)$(MAKE) $(build)=$@ \
+	need-builtin=$(if $(filter $@/built-in.a, $(subdir-builtin)),1)
 	
 # Add FORCE to the prequisites of a target to force it to be always rebuilt.
 # ---------------------------------------------------------------------------

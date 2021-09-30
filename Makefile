@@ -19,6 +19,12 @@ GUIX_DIR = guix
 USBX_DIR = usbx
 LPC_DIR = lpc_chip_177x_8x
 FILEX_DIR = filex
+
+BUILD_BUILTIN := 1
+
+export BUILD_BUILTIN
+
+
 export PROGDIR = $(CURDIR)
 export BUILDDIR = $(CURDIR)/build
 export LIBDIR ?= $(CURDIR)/build
@@ -69,7 +75,8 @@ app.elf : $(built-libs)
 
 
 $(built-libs):
-	$(Q)$(MAKE) $(build)=lib/Azure/threadx
+	$(Q)$(MAKE) $(build)=lib/Azure/threadx \
+	need_builtin := 1
 
 ######  Compile GUIX Library ############
 
