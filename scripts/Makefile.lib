@@ -1,8 +1,8 @@
+subdir-y := $(sort $(subdir-y)) $(patsubst %/,%, $(obj-y))
 
+subdir-y := $(addprefix $(obj)/,$(subdir-y))
 
-subdir-y := $(patsubst %/,%, $(obj-y))
 obj-y := $(filter-out %/, $(obj-y))
 
-$(obj)/%.o : %.c FORCE
-	$(Q)$(call compile,$(CC),$<,$@)	
+
     

@@ -29,11 +29,12 @@ export OBJDIR ?= $(LIBDIR)/obj
 INCLUDES += -I$(AZURE_DIR)/$(GUIX_DIR)/common/inc -I$(AZURE_DIR)/$(GUIX_DIR)/$(arch_cpu)/inc
 INCLUDES += -I$(CURDIR)/$(LPC_DIR)/inc
 
-VPATH += $(OBJDIR)/$(THREADX_DIR)
-VPATH += $(OBJDIR)/$(GUIX_DIR)
-VPATH += $(OBJDIR)/$(LPC_DIR)
+srctree := .
+VPATH := $(src_tree)
 
--include ./scripts/Makefile.include
+export srctree VPATH
+
+include ./scripts/Makefile.include
 
 ifeq ("$(origin V)", "command line")
   VERBOSE = $(V)
@@ -47,6 +48,7 @@ ifeq ($(VERBOSE),1)
 else
   Q = @
 endif
+
 
 export Q
 export VERBOSE
@@ -67,7 +69,7 @@ app.elf : $(built-libs)
 
 
 $(built-libs):
-	$(Q)$(MAKE) $(build)=$(patsubst %/,%,$(dir $@))
+	$(Q)$(MAKE) $(build)=lib/Azure/threadx
 
 ######  Compile GUIX Library ############
 

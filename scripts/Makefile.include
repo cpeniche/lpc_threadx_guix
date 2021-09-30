@@ -1,6 +1,6 @@
 
 
-build := -f $(PROGDIR)/scripts/Makefile.build obj
+build := -f $(srctree)/scripts/Makefile.build obj
 
 
 define dependencies
