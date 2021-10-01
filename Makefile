@@ -6,7 +6,7 @@ export APPDIR := application
 export TOOL ?= gnu
 
 
-AR := $(CROSS_COMPILE)ar
+export AR := $(CROSS_COMPILE)ar
 export CFLAGS := -mcpu=cortex-m3 -march=armv7-m -mthumb -O0 \
 		   -fmessage-length=0 -fsigned-char -ffunction-sections \
 		   -fdata-sections -g3 -DCORE_M3 -D__NO_SYSTEM_INIT
@@ -30,15 +30,12 @@ export BUILDDIR = $(CURDIR)/build
 export LIBDIR ?= $(CURDIR)/build
 export OBJDIR ?= $(LIBDIR)/obj
 
-#MAKEFLAGS += -rR
-
-INCLUDES += -I$(AZURE_DIR)/$(GUIX_DIR)/common/inc -I$(AZURE_DIR)/$(GUIX_DIR)/$(arch_cpu)/inc
-INCLUDES += -I$(CURDIR)/$(LPC_DIR)/inc
-
 srctree := .
 VPATH := $(src_tree)
 
 export srctree VPATH
+
+MAKEFLAGS += -rR
 
 include ./scripts/Makefile.include
 
@@ -67,7 +64,8 @@ $(shell mkdir -p $(OBJDIR)/$(LPC_DIR))
 endif
 
 built-in := ./application/built-in.o
-built-libs := $(PROGDIR)/lib/Azure/threadx/libtx.a $(PROGDIR)/lib/Azure/guix/guix.a $(PROGDIR)/lib/lpc_chip_177x_8x/lpc.a
+built-libs := $(PROGDIR)/lib/Azure/threadx/libtx.a 
+#$(PROGDIR)/lib/Azure/guix/guix.a $(PROGDIR)/lib/lpc_chip_177x_8x/lpc.a
 
 
 app.elf : $(built-libs)
@@ -76,7 +74,7 @@ app.elf : $(built-libs)
 
 $(built-libs):
 	$(Q)$(MAKE) $(build)=lib/Azure/threadx \
-	need_builtin := 1
+	need-builtin=1
 
 ######  Compile GUIX Library ############
 

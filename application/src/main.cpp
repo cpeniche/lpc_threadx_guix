@@ -2,7 +2,7 @@
 #include "tx_api.h"
 #include "display.h"
 
-#define DEMO_STACK_SIZE             (2 * 1024)
+#define DEMO_STACK_SIZE          (2 * 1024)
 void  main_thread_entry(ULONG arg);
 
 /* Define global data structures.   */

@@ -7,7 +7,7 @@ obj-y :=
 lib-y :=
 
 build-dir := $(if $(filter /%,$(src)),$(src),$(srctree)/$(src))
-#$(info Build directory : $(build-dir))
+#$(info Entering Makefile.build)
 include $(build-dir)/Makefile
 include $(PROGDIR)/scripts/Makefile.include
 include $(PROGDIR)/scripts/Makefile.lib
@@ -18,16 +18,24 @@ subdir-builtin := $(sort $(filter %/built-in.a, $(real-obj-y)))
 # ---------------------------------------------------------------------------
 $(subdir-builtin): $(obj)/%/built-in.a: $(obj)/% ;
 
+#$(info need-builtin = $(need-builtin))
 ifdef need-builtin
 targets-for-builtin += $(obj)/built-in.a
 endif
 
-
-$(obj)/%.o : %(src)/%.c FORCE
+# Built-in and composite module parts
+$(obj)/%.o : $(src)/%.c FORCE
 	$(Q)$(call compile,$(CC),$<,$@)	
 
-$(obj)/built-in.a: $(real-obj-y) FORCE
-	echo building archive
+$(obj)/%.o : $(src)/%.S FORCE
+	$(Q)$(call compile,$(CC),$<,$@)		
+
+$(obj)/built-in.a: $(real-obj-y)
+	@echo 'Building target: $@'
+	$(Q)$(AR) -cDPrST $@ $?
+	@echo 'Invoking: GNU Arm Cross Archiver'
+	@echo 'Finished building target: $@'
+	@echo ' '
 
 __build: $(if $(BUILD_BUILTIN), $(targets-for-builtin)) \
 		 $(subdir-y)
