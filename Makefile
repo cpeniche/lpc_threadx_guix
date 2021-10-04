@@ -64,17 +64,23 @@ $(shell mkdir -p $(OBJDIR)/$(LPC_DIR))
 endif
 
 built-in := ./application/built-in.o
-built-libs := $(PROGDIR)/lib/Azure/threadx/libtx.a 
+built-libs := lib/Azure/threadx lib/Azure/guix
 #$(PROGDIR)/lib/Azure/guix/guix.a $(PROGDIR)/lib/lpc_chip_177x_8x/lpc.a
+
+PHONY = $(built-libs) FORCE
 
 
 app.elf : $(built-libs)
 	$(Q)$(CPP) $^ -T $(cmd_file) $(LINKER_FLAGS) -L$(LIBDIR) -o$@ $(addprefix -l,$(LIBS))
 
 
-$(built-libs):
-	$(Q)$(MAKE) $(build)=lib/Azure/threadx \
+$(built-libs): FORCE
+	$(Q)$(MAKE) $(build)=$@ \
 	need-builtin=1
+
+FORCE:
+
+
 
 ######  Compile GUIX Library ############
 
@@ -119,3 +125,6 @@ commit :
 
 src_tree :
 	$(Q)$(MAKE) $@ -C ./lib/Azure/guix 
+
+
+.phony = $(PHONY)
