@@ -80,8 +80,6 @@ $(built-libs): FORCE
 
 FORCE:
 
-
-
 ######  Compile GUIX Library ############
 
 libgx : 
@@ -112,10 +110,8 @@ $(OBJDIR)/$(LPC_DIR)/%.o : %.c
 $(OBJDIR)/$(LPC_DIR)/%.d: %.c
 	$(Q)$(call dependencies,$@,$(@:%.d=%.o))
 	
-.phony: libtx libgx liblpc
-
 clean:	
-	$(Q)rm -rf $(LIBDIR)
+	$(Q)$(MAKE) $(build)=$@
 
 #remove the build directories and the threadx source links
 commit :

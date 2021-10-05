@@ -1,0 +1,27 @@
+src := $(obj)
+
+PHONY := __clean
+__clean:
+
+build-dir := $(if $(filter /%,$(src)),$(src),$(srctree)/$(src))
+#$(info Entering Makefile.build)
+include $(build-dir)/Makefile
+include $(PROGDIR)/scripts/Makefile.include
+include $(PROGDIR)/scripts/Makefile.lib
+
+
+# Figure out what we need to build from the various variables
+# ==========================================================================
+subdir-ymn := $(sort $(subdir-y)\
+		$(patsubst %/,%, $(filter %/, $(obj-y))))
+
+# Add subdir path
+
+subdir-ymn	:= $(addprefix $(obj)/,$(subdir-ymn))
+
+
+PHONY += $(subdir-ymn)
+$(subdir-ymn):
+	$(Q)$(MAKE) $(clean)=$@
+
+.PHONY: $(PHONY)
