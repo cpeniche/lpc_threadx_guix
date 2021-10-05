@@ -5,6 +5,7 @@ __build:
 
 obj-y :=
 lib-y :=
+targets := 
 
 build-dir := $(if $(filter /%,$(src)),$(src),$(srctree)/$(src))
 #$(info Entering Makefile.build)
@@ -23,12 +24,17 @@ ifdef need-builtin
 targets-for-builtin += $(obj)/built-in.a
 endif
 
+targets += $(targets-for-builtin)
+targets += $(filter-out $(subdir-builtin), $(real-obj-y))
+
 # Built-in and composite module parts
 $(obj)/%.o : $(src)/%.c FORCE
 	$(Q)$(call compile,$(CC),$<,$@)	
 
 $(obj)/%.o : $(src)/%.S FORCE
 	$(Q)$(call compile,$(CC),$<,$@)		
+
+targets += $(filter-out $(subdir-builtin), $(real-obj-y))	
 
 $(obj)/built-in.a: $(real-obj-y)
 	@echo 'Building target: $@'
@@ -38,13 +44,13 @@ $(obj)/built-in.a: $(real-obj-y)
 	@echo ' '
 
 __build: $(if $(BUILD_BUILTIN), $(targets-for-builtin)) \
-		 $(subdir-y)
+		 $(subdir-ym)
 	@:
 
 # Descending
 # ---------------------------------------------------------------------------
-PHONY += $(subdir-y)
-$(subdir-y):	
+PHONY += $(subdir-ym)
+$(subdir-ym):	
 	$(Q)$(MAKE) $(build)=$@ \
 	need-builtin=$(if $(filter $@/built-in.a, $(subdir-builtin)),1)
 	

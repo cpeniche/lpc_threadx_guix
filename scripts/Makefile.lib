@@ -1,8 +1,5 @@
-subdir-y := $(sort $(subdir-y) \
+subdir-ym := $(sort $(subdir-y) \
 			$(patsubst %/,%, $(filter %/, $(obj-y))))
-
-subdir-y := $(addprefix $(obj)/,$(subdir-y))
-
 
 # Expand $(foo-objs) $(foo-y) etc. by replacing their individuals
 suffix-search = $(strip $(foreach s, $3, $($(1:%$(strip $2)=%$s))))
@@ -20,6 +17,8 @@ else
 obj-y		:= $(filter-out %/, $(obj-y))
 endif
 
+subdir-ym  := $(addprefix $(obj)/,$(subdir-ym))
+targets	   := $(addprefix $(obj)/,$(targets))
 real-obj-y := $(addprefix $(obj)/,$(obj-y))
 
     

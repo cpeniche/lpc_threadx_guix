@@ -31,9 +31,10 @@ export LIBDIR ?= $(CURDIR)/build
 export OBJDIR ?= $(LIBDIR)/obj
 
 srctree := .
+objtree := .
 VPATH := $(src_tree)
 
-export srctree VPATH
+export srctree objtree VPATH
 
 MAKEFLAGS += -rR
 
@@ -65,7 +66,7 @@ endif
 
 built-in := ./application/built-in.o
 built-libs := lib/Azure/threadx lib/Azure/guix
-#$(PROGDIR)/lib/Azure/guix/guix.a $(PROGDIR)/lib/lpc_chip_177x_8x/lpc.a
+clean-dirs := lib/Azure/threadx lib/Azure/guix
 
 PHONY = $(built-libs) FORCE
 
@@ -110,8 +111,13 @@ $(OBJDIR)/$(LPC_DIR)/%.o : %.c
 $(OBJDIR)/$(LPC_DIR)/%.d: %.c
 	$(Q)$(call dependencies,$@,$(@:%.d=%.o))
 	
-clean:	
-	$(Q)$(MAKE) $(build)=$@
+clean-dirs := $(addprefix _clean_, $(clean-dirs))
+
+PHONY += $(clean-dirs) clean
+$(clean-dirs):
+	$(Q)$(MAKE) $(clean)=$(patsubst _clean_%,%,$@)
+
+clean: $(clean-dirs)	
 
 #remove the build directories and the threadx source links
 commit :
