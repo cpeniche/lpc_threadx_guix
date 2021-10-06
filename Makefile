@@ -17,7 +17,7 @@ export AZURE_DIR ?= /home/carlo/projects/Azure
 THREADX_DIR = threadx
 GUIX_DIR = guix
 USBX_DIR = usbx
-LPC_DIR = lpc_chip_177x_8x
+export LPC_DIR = lpc_chip_177x_8x
 FILEX_DIR = filex
 
 BUILD_BUILTIN := 1
@@ -36,7 +36,7 @@ VPATH := $(src_tree)
 
 export srctree objtree VPATH
 
-MAKEFLAGS += -rR
+MAKEFLAGS += -rR --no-print-directory
 
 include ./scripts/Makefile.include
 
@@ -65,15 +65,12 @@ $(shell mkdir -p $(OBJDIR)/$(LPC_DIR))
 endif
 
 built-in := ./application/built-in.o
-built-libs := lib/Azure/threadx lib/Azure/guix
-clean-dirs := lib/Azure/threadx lib/Azure/guix
+built-libs := lib/Azure/threadx lib/Azure/guix lib/lpc_chip_177x_8x
 
 PHONY = $(built-libs) FORCE
 
-
 app.elf : $(built-libs)
 	$(Q)$(CPP) $^ -T $(cmd_file) $(LINKER_FLAGS) -L$(LIBDIR) -o$@ $(addprefix -l,$(LIBS))
-
 
 $(built-libs): FORCE
 	$(Q)$(MAKE) $(build)=$@ \
@@ -111,13 +108,8 @@ $(OBJDIR)/$(LPC_DIR)/%.o : %.c
 $(OBJDIR)/$(LPC_DIR)/%.d: %.c
 	$(Q)$(call dependencies,$@,$(@:%.d=%.o))
 	
-clean-dirs := $(addprefix _clean_, $(clean-dirs))
-
-PHONY += $(clean-dirs) clean
-$(clean-dirs):
-	$(Q)$(MAKE) $(clean)=$(patsubst _clean_%,%,$@)
-
-clean: $(clean-dirs)	
+clean: 
+	@find -name '*.[aios]' -type f -print | xargs rm -f
 
 #remove the build directories and the threadx source links
 commit :
