@@ -109,7 +109,7 @@ $(OBJDIR)/$(LPC_DIR)/%.d: %.c
 	$(Q)$(call dependencies,$@,$(@:%.d=%.o))
 	
 clean: 
-	@find -name '*.[aios]' -type f -print | xargs rm -f
+	@find -name '*.[aod]' -type f -print | xargs rm -f
 
 #remove the build directories and the threadx source links
 commit :

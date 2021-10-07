@@ -13,7 +13,7 @@ clean := -f $(srctree)/scripts/Makefile.clean obj
 
 
 define dependencies
-  echo "building dependency file : $(notdir $(1))";\
+  echo "[DEP]    $(1)";\
   $(CC) -MM -MT$(1) -MT$(2) $(CFLAGS) $(INCLUDES) $< > $(1)
 endef
 

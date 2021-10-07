@@ -28,14 +28,26 @@ targets += $(targets-for-builtin)
 targets += $(filter-out $(subdir-builtin), $(real-obj-y))
 
 # Built-in and composite module parts
-$(obj)/%.o : $(src)/%.c FORCE
-	$(Q)$(call compile,$(CC),$<,$@)	
+$(obj)/%.o : $(src)/%.c
+	$(Q)$(call compile,$(CC),$<,$@)
 
-$(obj)/%.o : $(src)/%.S FORCE
-	$(Q)$(call compile,$(CC),$<,$@)		
+#object files
+$(obj)/%.o : $(src)/%.S 
+	$(Q)$(call compile,$(CC),$<,$@)
 
-targets += $(filter-out $(subdir-builtin), $(real-obj-y))	
+#--------  dependency files -----------------
+ifneq ($(filter %.o, $(real-obj-y)),)
+#$(info including file = $(real-obj-y:%.o=%.d))
+-include $(real-obj-y:%.o=%.d)
+endif
 
+$(obj)/%.d : $(src)/%.c
+	$(Q)$(call dependencies,$@,$(@:%.d=%.o))
+
+$(obj)/%.d : $(src)/%.S
+	$(Q)$(call dependencies,$@,$(@:%.d=%.o))
+
+#----------------------------------------------------
 $(obj)/built-in.a: $(real-obj-y)
 	@echo 'Building target: $@'
 	$(Q)$(AR) -cDPrST $@ $?

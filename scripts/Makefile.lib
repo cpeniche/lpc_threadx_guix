@@ -20,5 +20,6 @@ endif
 subdir-ym  := $(addprefix $(obj)/,$(subdir-ym))
 targets	   := $(addprefix $(obj)/,$(targets))
 real-obj-y := $(addprefix $(obj)/,$(obj-y))
+obj-dep    := $(addprefix $(obj)/,$(obj-y:%.o=%.d))
 
     
