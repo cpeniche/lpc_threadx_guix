@@ -11,6 +11,10 @@ export CFLAGS := -mcpu=cortex-m3 -march=armv7-m -mthumb -O0 \
 		   -fmessage-length=0 -fsigned-char -ffunction-sections \
 		   -fdata-sections -g3 -DCORE_M3 -D__NO_SYSTEM_INIT
 
+LDFLAGS = -mcpu=cortex-m3  \
+		--specs=nosys.specs -Wl,-Map="app.map" -Wl,--gc-sections -static \
+		--specs=nano.specs  -mthumb
+
 
 #Extract threadx directory
 export AZURE_DIR ?= /home/carlo/projects/Azure
@@ -23,8 +27,6 @@ FILEX_DIR = filex
 BUILD_BUILTIN := 1
 
 export BUILD_BUILTIN
-
-
 export PROGDIR = $(CURDIR)
 export BUILDDIR = $(CURDIR)/build
 export LIBDIR ?= $(CURDIR)/build
@@ -52,8 +54,6 @@ ifeq ($(VERBOSE),1)
 else
   Q = @
 endif
-
-
 export Q
 export VERBOSE
 export INCLUDES
@@ -64,50 +64,22 @@ VPATH += $(CURDIR)/$(LPC_DIR)/src
 $(shell mkdir -p $(OBJDIR)/$(LPC_DIR))
 endif
 
-built-in := ./application/built-in.o
-built-libs := lib/Azure/threadx lib/Azure/guix lib/lpc_chip_177x_8x
+export cmd_file := application/gcc_arm.ld
+_dirs := application/ lib/Azure/threadx/ lib/Azure/guix/ lib/lpc_chip_177x_8x/
 
-PHONY = $(built-libs) FORCE
+built-ins := $(patsubst %/,%/built-in.a, $(_dirs))
 
-app.elf : $(built-libs)
-	$(Q)$(CPP) $^ -T $(cmd_file) $(LINKER_FLAGS) -L$(LIBDIR) -o$@ $(addprefix -l,$(LIBS))
+PHONY = $(built-ins) FORCE
 
-$(built-libs): FORCE
-	$(Q)$(MAKE) $(build)=$@ \
+app.elf : $(built-ins) 
+	$(Q)$(CPP) $^ application/built-in.a -T $(cmd_file) $(LDFLAGS) -o $@ 
+
+$(built-ins): FORCE
+	$(Q)$(MAKE) $(build)=$(patsubst %/,%,$(dir $@)) \
 	need-builtin=1
 
 FORCE:
 
-######  Compile GUIX Library ############
-
-libgx : 
-	$(Q)$(MAKE) build -C ./lib/Azure/guix
-
-######  Compile THREADX Library #######
-
-libtx: 
-	$(Q)$(MAKE) build -C ./lib/Azure/threadx	
-
-####-------------------------------------###
-
-liblpc: $(LIBDIR)/liblpc.a
-
-$(LIBDIR)/liblpc.a : $(addprefix $(OBJDIR)/$(LPC_DIR)/,$(obj-lpc)) 
-	@echo 'Building target: $@'
-	@echo 'Invoking: GNU Arm Cross Archiver'
-	$(Q)$(AR) -r $@ $? 
-	@echo 'Finished building target: $@'
-	@echo ' '
-
-#common lpc files
-$(OBJDIR)/$(LPC_DIR)/%.o : %.c
-	$(Q)$(call compile,$(CC),$<,$@)
-
--include $(addprefix $(OBJDIR)/$(LPC_DIR)/,$(obj-lpc:%.o=%.d))
-
-$(OBJDIR)/$(LPC_DIR)/%.d: %.c
-	$(Q)$(call dependencies,$@,$(@:%.d=%.o))
-	
 clean: 
 	@find -name '*.[aod]' -type f -print | xargs rm -f
 

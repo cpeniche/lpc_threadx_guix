@@ -11,6 +11,7 @@ TX_THREAD  main_thread;
 ULONG      class_driver_index;
 UINT       status;
 CHAR       main_thread_name[]="main thread";
+const uint32_t OscRateIn = 0; /*@@@@@@@@  needs fix */
 
 int main()
 {
@@ -19,7 +20,7 @@ int main()
 
   Display_Init_Pinmux();
   /* Initialize the LCD controller */
-  Chip_LCD_Init(LPC_LCD,&lcd_config, &display_fb[0][0]);
+  //Chip_LCD_Init(LPC_LCD,&lcd_config, &display_fb[0][0]);
   /* Enter the ThreadX kernel. */
   tx_kernel_enter( );
 

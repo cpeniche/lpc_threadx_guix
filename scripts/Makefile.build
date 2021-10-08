@@ -35,6 +35,9 @@ $(obj)/%.o : $(src)/%.c
 $(obj)/%.o : $(src)/%.S 
 	$(Q)$(call compile,$(CC),$<,$@)
 
+$(obj)/%.o : $(src)/%.cpp
+	$(Q)$(call compile,$(CPP),$<,$@)
+
 #--------  dependency files -----------------
 ifneq ($(filter %.o, $(real-obj-y)),)
 #$(info including file = $(real-obj-y:%.o=%.d))
@@ -47,10 +50,13 @@ $(obj)/%.d : $(src)/%.c
 $(obj)/%.d : $(src)/%.S
 	$(Q)$(call dependencies,$@,$(@:%.d=%.o))
 
+$(obj)/%.d : $(src)/%.cpp
+	$(Q)$(call dependencies,$@,$(@:%.d=%.o))
+
 #----------------------------------------------------
 $(obj)/built-in.a: $(real-obj-y)
 	@echo 'Building target: $@'
-	$(Q)$(AR) -cDPrST $@ $?
+	$(Q)$(AR) -cDPrT $@ $?
 	@echo 'Invoking: GNU Arm Cross Archiver'
 	@echo 'Finished building target: $@'
 	@echo ' '
