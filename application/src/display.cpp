@@ -71,7 +71,6 @@ void Display_Init_Pinmux()
     for (y=0;y<32;y++)
     {
       pinmux.p[i][y]= base + (y*4);
-
     }
     base = pinmux.p[i][y-1] + 4;
   }

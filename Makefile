@@ -71,8 +71,9 @@ built-ins := $(patsubst %/,%/built-in.a, $(_dirs))
 
 PHONY = $(built-ins) FORCE
 
-app.elf : $(built-ins) 
-	$(Q)$(CPP) $^ application/built-in.a -T $(cmd_file) $(LDFLAGS) -o $@ 
+app.elf : $(built-ins) FORCE
+	$(Q) echo "Linking Application:  $@"
+	$(Q)$(CPP) -Wl,--start-group $(built-ins) -Wl,--end-group  -T $(cmd_file) $(LDFLAGS) -o $@ 
 
 $(built-ins): FORCE
 	$(Q)$(MAKE) $(build)=$(patsubst %/,%,$(dir $@)) \
@@ -81,16 +82,7 @@ $(built-ins): FORCE
 FORCE:
 
 clean: 
+	@rm -f *.map *.elf
 	@find -name '*.[aod]' -type f -print | xargs rm -f
-
-#remove the build directories and the threadx source links
-commit :
-	$(Q)rm -rf $(LIBDIR)
-	$(Q)$(MAKE) $@ -C ./lib/Azure/threadx
-	$(Q)$(MAKE) $@ -C ./lib/Azure/guix
-
-src_tree :
-	$(Q)$(MAKE) $@ -C ./lib/Azure/guix 
-
 
 .phony = $(PHONY)

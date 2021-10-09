@@ -11,26 +11,27 @@ TX_THREAD  main_thread;
 ULONG      class_driver_index;
 UINT       status;
 CHAR       main_thread_name[]="main thread";
-const uint32_t OscRateIn = 0; /*@@@@@@@@  needs fix */
+
 
 int main()
 {
 
   Chip_SystemInit();
 
-  Display_Init_Pinmux();
+  /*Initialize LCD pin out*/
+	Display_Init_Pinmux();
+
   /* Initialize the LCD controller */
-  //Chip_LCD_Init(LPC_LCD,&lcd_config, &display_fb[0][0]);
+  Chip_LCD_Init(LPC_LCD,&lcd_config);
+
   /* Enter the ThreadX kernel. */
   tx_kernel_enter( );
-
-
 }
 
 void tx_application_define(void *first_unused_memory)
 {
-  CHAR    *stack_pointer;
-  CHAR    *memory_pointer;
+	CHAR *stack_pointer;
+	CHAR *memory_pointer;
 
   /* Initialize the free memory pointer */
   stack_pointer =   (CHAR *) first_unused_memory;
@@ -50,7 +51,5 @@ void  main_thread_entry(ULONG arg)
   while(1)
  {
       i++;
-
-
  }
 }
