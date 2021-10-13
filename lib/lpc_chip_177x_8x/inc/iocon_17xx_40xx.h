@@ -236,7 +236,7 @@ STATIC INLINE void Chip_IOCON_SetI2CPad(LPC_IOCON_T *pIOCON, IOCON_I2CPINS_CONFI
  */
 STATIC INLINE void Chip_IOCON_PinMuxSet(LPC_IOCON_T *pIOCON, uint8_t port, uint8_t pin, uint32_t modefunc)
 {
-	pIOCON->p[port][pin] = modefunc;
+	*(uint32_t *)(pIOCON->p[port][pin]) = modefunc;
 }
 
 /**

@@ -16,13 +16,15 @@ CHAR       main_thread_name[]="main thread";
 int main()
 {
 
-  Chip_SystemInit();
+	Chip_SystemInit();
 
-  /*Initialize LCD pin out*/
+	/*Initialize LCD pin out*/
 	Display_Init_Pinmux();
 
   /* Initialize the LCD controller */
   Chip_LCD_Init(LPC_LCD,&lcd_config);
+
+	LPC_LCD->UPBASE = (uint32_t)display_fb;
 
   /* Enter the ThreadX kernel. */
   tx_kernel_enter( );
@@ -50,6 +52,6 @@ void  main_thread_entry(ULONG arg)
 
   while(1)
  {
-      i++;
+		i++;
  }
 }
