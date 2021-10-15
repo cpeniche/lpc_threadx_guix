@@ -118,7 +118,7 @@ void Chip_LCD_Init(LPC_LCD_T *pLCD, LCD_CONFIG_T *LCD_ConfigStruct)
 
 	/* set color format RGB */
 	regValue |= LCD_ConfigStruct->color_format << 8;
-	regValue |= LCD_ConfigStruct->LCD << 4;
+	regValue |= LCD_ConfigStruct->LCD << 5;
 	if (LCD_ConfigStruct->Dual == 1) {
 		regValue |= 1 << 7;
 	}
