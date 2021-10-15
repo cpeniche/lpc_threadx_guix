@@ -18,13 +18,7 @@ int main()
 
 	Chip_SystemInit();
 
-	/*Initialize LCD pin out*/
-	Display_Init_Pinmux();
-
-  /* Initialize the LCD controller */
-  Chip_LCD_Init(LPC_LCD,&lcd_config);
-
-	LPC_LCD->UPBASE = (uint32_t)display_fb;
+	Initialize_Display();
 
   /* Enter the ThreadX kernel. */
   tx_kernel_enter( );

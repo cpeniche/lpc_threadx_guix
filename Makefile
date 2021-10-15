@@ -13,7 +13,7 @@ export CFLAGS := -mcpu=cortex-m3 -march=armv7-m -mthumb -O0 \
 
 LDFLAGS = -mcpu=cortex-m3  \
 		--specs=nosys.specs -Wl,-Map="app.map" -Wl,--gc-sections -static \
-		--specs=nano.specs  -mthumb
+		--specs=nano.specs
 
 
 #Extract threadx directory
