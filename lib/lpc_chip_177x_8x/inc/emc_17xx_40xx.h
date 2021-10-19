@@ -116,6 +116,7 @@ typedef struct {							/*!< EMC Structure          */
 	__IO uint32_t  STATICWAITTURN3;			/*!< Selects bus turnaround cycles */
 } LPC_EMC_T;
 
+
 /**
  * Dynamic Chip Select Address
  */
