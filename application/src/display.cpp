@@ -7,7 +7,7 @@
 
 
 LPC_IOCON_T pinmux;  /* Hold the address of each IO_CON registers */
-uint16_t display_fb[40][24] __attribute__((aligned(32)));
+uint16_t display_fb[40][24] __attribute__((section(".sram")));
 LPC_LCD_T lcd_regs;
 
 const PINMUX_GRP_T pin[] =

@@ -243,7 +243,7 @@ typedef struct {							/*!< EMC Structure          */
  * @brief	EMC Dynamic Device Configuration structure used for IP drivers
  */
 typedef struct {
-	uint32_t    BaseAddr;		/*!< Base Address */
+	uint32_t    Addr;		/*!< Base Address */
 	uint8_t     RAS;			/*!< RAS value */
 	uint32_t    ModeRegister;	/*!< Mode Register value */
 	uint32_t    DynConfig;		/*!< Dynamic Configuration value */

@@ -1,8 +1,7 @@
 
+#include "chip.h"
 #include "chip_lpc177x_8x.h"
 #include "emc_17xx_40xx.h"
-
-
 /*
  * SCC registers
  */
@@ -70,34 +69,32 @@
  * In the low-power mode this shift will be different.
  */
 
-
-
-IP_EMC_DYN_CONFIG_T Sram_Default_Config =
+IP_EMC_DYN_CONFIG_T Sram_Default_Config  =
 {
-  .RefreshPeriod    = 1,                   /*!< Refresh period */
-  .ReadConfig       = 1                    /*!< Clock*/
-  .tRP;                                    /*!< Precharge Command Period */
-  .tRAS;                                   /*!< Active to Precharge Command Period */
-  .tSREX;                                  /*!< Self Refresh Exit Time */
-  .tAPR;                                   /*!< Last Data Out to Active Time */
-  .tDAL;                                   /*!< Data In to Active Command Time */
-  .tWR;                                    /*!< Write Recovery Time */
-  .tRC;                                    /*!< Active to Active Command Period */
-  .tRFC;                                   /*!< Auto-refresh Period */
-  .tXSR;                                   /*!< Exit Selt Refresh */
-  .tRRD;                                   /*!< Active Bank A to Active Bank B Time */
-  .tMRD;                                   /*!< Load Mode register command to Active Command */
+  .RefreshPeriod  = 0x1D,    /*!< Refresh period 7.8us/row */
+  .ReadConfig     = 0x01,    /*!< Clock*/
+  .tRP            = 0x01,    /*!< Precharge Command Period */
+  .tRAS           = 0x03,    /*!< Active to Precharge Command Period */
+  .tSREX          = 0x03,    /*!< Self Refresh Exit Time */
+  .tAPR           = 0x01,    /*!< Last Data Out to Active Time */
+  .tDAL           = 0x01,    /*!< Data In to Active Command Time */
+  .tWR            = 0x01,    /*!< Write Recovery Time */
+  .tRC            = 0x03,    /*!< Active to Active Command Period */
+  .tRFC           = 0x03,    /*!< Auto-refresh Period */
+  .tXSR           = 0x03,    /*!< Exit Selt Refresh */
+  .tRRD           = 0x00,    /*!< Active Bank A to Active Bank B Time */
+  .tMRD           = 0x00,    /*!< Load Mode register command to Active Command */
+  .DevConfig =
   {
-    .BaseAddr;       /*!< Base Address */
-    .RAS;            /*!< RAS value */
-    .ModeRegister = LPC178X_EMC_MODEREG_VALUE  /*!< Mode Register value */
-    .DynConfig = (LPC178X_EMC_AM << LPC178X_EMC_DYCFG_AM_BITS);
+    0x00,     /*!< Base Address */
+    0x02,      /*!< RAS value */
+    LPC178X_EMC_MODEREG_VALUE,  /*!< Mode Register value */
+    (LPC178X_EMC_AM << LPC178X_EMC_DYCFG_AM_BITS)
   }
-  };
+};
 
-
-
-void sram_init()
+/******************************************/
+void Sram_Init()
 {
 
   /* Enable peripheral clock */
@@ -107,6 +104,6 @@ void sram_init()
   LPC_SYSCTL->EMCDLYCTL = (LPC178X_EMC_CMDDLY << SCC_EMCDLYCTL_CMDDLY_BITS) |
                           (LPC178X_EMC_FBCLKDLY << SCC_EMCDLYCTL_FBCLKDLY_BITS);
 
-  Chip_EMC_Dynamic_Init()
+  Chip_EMC_Dynamic_Init(&Sram_Default_Config);
 
 }

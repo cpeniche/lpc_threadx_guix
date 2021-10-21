@@ -15,6 +15,7 @@ LDFLAGS = -mcpu=cortex-m3  \
 		--specs=nosys.specs -Wl,-Map="app.map" -Wl,--gc-sections -static \
 		--specs=nano.specs
 
+SHELL:=/bin/bash
 
 #Extract threadx directory
 export AZURE_DIR ?= /home/carlo/projects/Azure

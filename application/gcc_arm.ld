@@ -3,7 +3,7 @@ MEMORY
 {
   FLASH  (rx)  : ORIGIN = 0x00000000, LENGTH = 0x40000   /* 256k */
   RAM    (rwx) : ORIGIN = 0x20000000, LENGTH = 0x08000   /*  32k */
-  SD_RAM (xrw) : ORIGIN = 0xC0000000,   LENGTH = 8192K
+  SD_RAM (xrw) : ORIGIN = 0xA0000000, LENGTH = 0xFFFFFFF
 }
 
 /* Library configurations */
@@ -194,4 +194,9 @@ SECTIONS
 
 	/* Check if data + heap + stack exceeds RAM limit */
 	ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")
+	
+	.sram :
+	{
+	
+	}>SD_RAM
 }

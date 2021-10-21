@@ -166,7 +166,7 @@ void initDynMem(LPC_EMC_T *pEMC, IP_EMC_DYN_CONFIG_T *Dynamic_Config, uint32_t E
 			/*burst_length = 4;*/
 			Col_len += 1;
 		}
-		DynAddr = Dynamic_Config->DevConfig[ChipSelect].BaseAddr;
+		DynAddr = Dynamic_Config->DevConfig[ChipSelect].Addr;
 
 		if (DynAddr != 0) {
 			uint32_t temp;
