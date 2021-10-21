@@ -4,10 +4,11 @@
 #include "chip_lpc177x_8x.h"
 #include "iocon_17xx_40xx.h"
 #include "lcd_17xx_40xx.h"
+#include "display.h"
 
 
 LPC_IOCON_T pinmux;  /* Hold the address of each IO_CON registers */
-uint16_t display_fb[40][24] __attribute__((section(".sram")));
+uint16_t display_fb[800][480] __attribute__((section(".sram")));
 LPC_LCD_T lcd_regs;
 
 const PINMUX_GRP_T pin[] =
