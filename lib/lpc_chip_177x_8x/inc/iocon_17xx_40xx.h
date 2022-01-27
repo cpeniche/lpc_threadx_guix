@@ -226,6 +226,7 @@ STATIC INLINE void Chip_IOCON_SetI2CPad(LPC_IOCON_T *pIOCON, IOCON_I2CPINS_CONFI
 }
 
 #else
+
 /**
  * @brief	Sets I/O Control pin mux
  * @param	pIOCON		: The base of IOCON peripheral on the chip

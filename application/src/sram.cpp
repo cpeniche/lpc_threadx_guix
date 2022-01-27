@@ -1,4 +1,3 @@
-
 #include "chip.h"
 #include "chip_lpc177x_8x.h"
 #include "emc_17xx_40xx.h"
@@ -69,24 +68,58 @@
  * In the low-power mode this shift will be different.
  */
 
+#define LPC178X_GPIO_EMC_REGVAL \
+	(FUNC1 | IOCON_MODE_INACT | IOCON_FASTSLEW_EN)
+
+
+
+const PINMUX_GRP_T pin[] ={
+  /* Configure EMC bank address select 0 and 1 (BA0, BA1) */
+	{4, 13, LPC178X_GPIO_EMC_REGVAL},
+	{4, 14, LPC178X_GPIO_EMC_REGVAL},
+
+	/* Configure EMC column address strobe (CAS) */
+	{2, 16, LPC178X_GPIO_EMC_REGVAL},
+	/* Configure EMC row address strobe (RAS) */
+	{2, 17, LPC178X_GPIO_EMC_REGVAL},
+
+	/* Configure EMC write enable (WE) */
+	{4, 25, LPC178X_GPIO_EMC_REGVAL},
+
+	/* Configure EMC clock input (CLK) */
+	{2, 18, LPC178X_GPIO_EMC_REGVAL},
+	/* Configure EMC clock enable (CKE) */
+	{2, 24, LPC178X_GPIO_EMC_REGVAL},
+
+	/* Configure EMC chip select (DYCS0) */
+	{2, 20, LPC178X_GPIO_EMC_REGVAL},
+
+	/* Configure EMC I/O mask (DQM0..DQM3) */
+	{2, 28, LPC178X_GPIO_EMC_REGVAL},
+	{2, 29, LPC178X_GPIO_EMC_REGVAL},
+	{2, 30, LPC178X_GPIO_EMC_REGVAL},
+	{2, 31, LPC178X_GPIO_EMC_REGVAL},
+
+};
+
 IP_EMC_DYN_CONFIG_T Sram_Default_Config  =
 {
   .RefreshPeriod  = 0x1D,    /*!< Refresh period 7.8us/row */
   .ReadConfig     = 0x01,    /*!< Clock*/
-  .tRP            = 0x01,    /*!< Precharge Command Period */
-  .tRAS           = 0x03,    /*!< Active to Precharge Command Period */
-  .tSREX          = 0x03,    /*!< Self Refresh Exit Time */
-  .tAPR           = 0x01,    /*!< Last Data Out to Active Time */
-  .tDAL           = 0x01,    /*!< Data In to Active Command Time */
-  .tWR            = 0x01,    /*!< Write Recovery Time */
-  .tRC            = 0x03,    /*!< Active to Active Command Period */
-  .tRFC           = 0x03,    /*!< Auto-refresh Period */
-  .tXSR           = 0x03,    /*!< Exit Selt Refresh */
-  .tRRD           = 0x00,    /*!< Active Bank A to Active Bank B Time */
-  .tMRD           = 0x00,    /*!< Load Mode register command to Active Command */
+  .tRP            = 9,    /*!< Precharge Command Period */
+  .tRAS           = 25,    /*!< Active to Precharge Command Period */
+  .tSREX          = 35,    /*!< Self Refresh Exit Time */
+  .tAPR           = 20,    /*!< Last Data Out to Active Time */
+  .tDAL           = 20,    /*!< Data In to Active Command Time */
+  .tWR            = 20,    /*!< Write Recovery Time */
+  .tRC            = 33,    /*!< Active to Active Command Period */
+  .tRFC           = 35,    /*!< Auto-refresh Period */
+  .tXSR           = 35,    /*!< Exit Selt Refresh */
+  .tRRD           = 12,    /*!< Active Bank A to Active Bank B Time */
+  .tMRD           = 2,    /*!< Load Mode register command to Active Command */
   .DevConfig =
   {
-    0x00,     /*!< Base Address */
+    0xA0000000,     /*!< Base Address */
     0x02,      /*!< RAS value */
     LPC178X_EMC_MODEREG_VALUE,  /*!< Mode Register value */
     (LPC178X_EMC_AM << LPC178X_EMC_DYCFG_AM_BITS)
@@ -96,6 +129,16 @@ IP_EMC_DYN_CONFIG_T Sram_Default_Config  =
 /******************************************/
 void Sram_Init()
 {
+  uint32_t index=0;
+  LPC_IOCON_T base={0};
+
+  for(index=0; index<(sizeof(pin)/sizeof(PINMUX_GRP_T)); index++)
+  {
+    base.p[pin[index].pingrp][pin[index].pinnum] = (LPC_IOCON_BASE + (pin[index].pingrp) * 0x80 \
+                                                                   + (pin[index].pinnum) * 4);
+  }
+
+  Chip_IOCON_SetPinMuxing(&base, pin, sizeof(pin) / sizeof(PINMUX_GRP_T));
 
   /* Enable peripheral clock */
   Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_EMC);
@@ -104,6 +147,6 @@ void Sram_Init()
   LPC_SYSCTL->EMCDLYCTL = (LPC178X_EMC_CMDDLY << SCC_EMCDLYCTL_CMDDLY_BITS) |
                           (LPC178X_EMC_FBCLKDLY << SCC_EMCDLYCTL_FBCLKDLY_BITS);
 
-  Chip_EMC_Dynamic_Init(&Sram_Default_Config);
+  Chip_EMC_Dynamic_Init(&Sram_Default_Config,1);
 
 }

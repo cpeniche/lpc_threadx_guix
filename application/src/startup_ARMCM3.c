@@ -97,7 +97,7 @@ static uint8_t heap[__HEAP_SIZE]   __attribute__ ((aligned(8), used, section(".h
  *----------------------------------------------------------------------------*/
 /* Cortex-M3 Processor Exceptions */
 void NMI_Handler         (void) __attribute__ ((weak, alias("Default_Handler")));
-void HardFault_Handler   (void) __attribute__ ((weak, alias("Default_Handler")));
+void HardFault_Handler   (void) __attribute__ ((weak, alias("Default_Handler1")));
 void MemManage_Handler   (void) __attribute__ ((weak, alias("Default_Handler")));
 void BusFault_Handler    (void) __attribute__ ((weak, alias("Default_Handler")));
 void UsageFault_Handler  (void) __attribute__ ((weak, alias("Default_Handler")));
@@ -299,6 +299,11 @@ void Reset_Handler(void) {
   Default Handler for Exceptions / Interrupts
  *----------------------------------------------------------------------------*/
 void Default_Handler(void) {
+
+	while(1);
+}
+
+void Default_Handler1(void) {
 
 	while(1);
 }
