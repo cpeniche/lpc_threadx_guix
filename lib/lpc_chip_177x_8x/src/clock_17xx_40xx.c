@@ -101,7 +101,7 @@ void Chip_Clock_EnablePeriphClock(CHIP_SYSCTL_CLOCK_T clk) {
 		LPC_SYSCTL->PCONP |= (1 << bs);
 	}
 #else
-	LPC_SYSCTL->PCONP |= (1 << bs);
+	LPC_SYSCTL->PCONP |= (1 << bs);	
 #endif
 }
 

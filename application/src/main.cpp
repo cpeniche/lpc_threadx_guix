@@ -1,6 +1,7 @@
 #include "chip.h"
 #include "tx_api.h"
 #include "display.h"
+#include "sram.h"
 
 #define DEMO_STACK_SIZE          (2 * 1024)
 void  main_thread_entry(ULONG arg);
@@ -11,14 +12,19 @@ TX_THREAD  main_thread;
 ULONG      class_driver_index;
 UINT       status;
 CHAR       main_thread_name[]="main thread";
-
+const uint32_t OscRateIn = 12000000;
 
 int main()
 {
-
+  
+  uint32_t *Address = (uint32_t *)0xA00000000;
+  uint32_t readback =0;
+  
 	Chip_SystemInit();
-
+  Sram_Init();
+  *Address = 0x55;
 	Initialize_Display();
+  readback = *Address;
 
   /* Enter the ThreadX kernel. */
   tx_kernel_enter( );

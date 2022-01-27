@@ -286,9 +286,10 @@ typedef struct {
 /**
  * @brief	Dyanmic memory setup
  * @param	Dynamic_Config	: Pointer to dynamic memory setup data
+ * @param	sram_num : Number of Memories to configure
  * @return	None
  */
-void Chip_EMC_Dynamic_Init(IP_EMC_DYN_CONFIG_T *Dynamic_Config);
+void Chip_EMC_Dynamic_Init(IP_EMC_DYN_CONFIG_T *Dynamic_Config, uint8_t sram_num);
 
 /**
  * @brief	Static memory setup

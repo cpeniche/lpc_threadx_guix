@@ -67,13 +67,13 @@ STATIC uint32_t convertTimmingParam(uint32_t EMC_Clock, int32_t input_ns, uint32
 		return (-input_ns) >> 8;
 	}
 	temp = EMC_Clock / 1000000;		/* MHz calculation */
-	temp = temp * input_ns / 1000;
+	temp = (temp * input_ns) / 1000;
 
-	/* round up */
+	/* round up 
 	temp += 0xFF;
 
-	/* convert to simple integer number format */
-	temp >>= 8;
+	/* convert to simple integer number format 
+	temp >>= 8;*/
 	if (temp > adjust) {
 		return temp - adjust;
 	}
@@ -101,12 +101,13 @@ STATIC uint32_t getColsLen(uint32_t DynConfig)
 
 /* Initializes the Dynamic Controller according to the specified parameters
    in the IP_EMC_DYN_CONFIG_T */
-void initDynMem(LPC_EMC_T *pEMC, IP_EMC_DYN_CONFIG_T *Dynamic_Config, uint32_t EMC_Clock)
+void initDynMem(LPC_EMC_T *pEMC, IP_EMC_DYN_CONFIG_T *Dynamic_Config, uint32_t EMC_Clock, uint8_t Num_Sram)
 {
 	uint32_t ChipSelect, tmpclk;
 	int i;
 
-	for (ChipSelect = 0; ChipSelect < 4; ChipSelect++) {
+	for (ChipSelect = 0; ChipSelect < Num_Sram; ChipSelect++) {
+
 		LPC_EMC_T *EMC_Reg_add = (LPC_EMC_T *) ((uint32_t) pEMC + (ChipSelect << 5));
 
 		EMC_Reg_add->DYNAMICRASCAS0    = Dynamic_Config->DevConfig[ChipSelect].RAS |
@@ -149,7 +150,8 @@ void initDynMem(LPC_EMC_T *pEMC, IP_EMC_DYN_CONFIG_T *Dynamic_Config, uint32_t E
 
 	pEMC->DYNAMICCONTROL    = 0x00000083;	/* Issue MODE command */
 
-	for (ChipSelect = 0; ChipSelect < 4; ChipSelect++) {
+
+	for (ChipSelect = 0; ChipSelect < Num_Sram; ChipSelect++) {
 		/*uint32_t burst_length;*/
 		uint32_t DynAddr;
 		uint8_t Col_len;
@@ -176,6 +178,7 @@ void initDynMem(LPC_EMC_T *pEMC, IP_EMC_DYN_CONFIG_T *Dynamic_Config, uint32_t E
 			temp = temp;
 		}
 	}
+
 	pEMC->DYNAMICCONTROL    = 0x00000000;	/* Issue NORMAL command */
 
 	/* enable buffers */
@@ -205,14 +208,14 @@ void initStaticMem(LPC_EMC_T *pEMC, IP_EMC_STATIC_CONFIG_T *Static_Config, uint3
  ****************************************************************************/
 
 /* Dyanmic memory setup */
-void Chip_EMC_Dynamic_Init(IP_EMC_DYN_CONFIG_T *Dynamic_Config)
+void Chip_EMC_Dynamic_Init(IP_EMC_DYN_CONFIG_T *Dynamic_Config, uint8_t sram_num)
 {
 	uint32_t ClkFreq;
 
 	/* Note clocks must be enabled prior to this call */
 	ClkFreq = Chip_Clock_GetEMCClockRate();
 
-	initDynMem(LPC_EMC, Dynamic_Config, ClkFreq);
+	initDynMem(LPC_EMC, Dynamic_Config, ClkFreq, sram_num);
 }
 
 /* Enable Dynamic Memory Controller */
