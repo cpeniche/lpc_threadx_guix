@@ -134,7 +134,7 @@ void Sram_Init()
 
   for(index=0; index<(sizeof(pin)/sizeof(PINMUX_GRP_T)); index++)
   {
-    base.p[pin[index].pingrp][pin[index].pinnum] = (LPC_IOCON_BASE + (pin[index].pingrp) * 0x80 /
+    base.p[pin[index].pingrp][pin[index].pinnum] = (LPC_IOCON_BASE + (pin[index].pingrp) * 0x80 \
                                                                    + (pin[index].pinnum) * 4);
   }
 
