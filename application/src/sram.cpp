@@ -1,9 +1,13 @@
 #include "chip.h"
 #include "chip_lpc177x_8x.h"
 #include "emc_17xx_40xx.h"
-/*
- * SCC registers
- */
+
+
+/* EMC data pins (DQ0..DQ31) */
+#define LPC178X_EMC_DATA_PINS	31
+
+/* EMC row/column address pins (A0..A11) */
+#define LPC178X_EMC_ADDR_PINS	12
 /*
  * EMC Delay Control register
  */
@@ -129,9 +133,10 @@ IP_EMC_DYN_CONFIG_T Sram_Default_Config  =
 /******************************************/
 void Sram_Init()
 {
-  uint32_t index=0;
+  uint32_t index=0,port=0, base_addr;
   LPC_IOCON_T base={0};
 
+  /* Configure pins as table pin[] */
   for(index=0; index<(sizeof(pin)/sizeof(PINMUX_GRP_T)); index++)
   {
     base.p[pin[index].pingrp][pin[index].pinnum] = (LPC_IOCON_BASE + (pin[index].pingrp) * 0x80 \
@@ -139,8 +144,26 @@ void Sram_Init()
   }
 
   Chip_IOCON_SetPinMuxing(&base, pin, sizeof(pin) / sizeof(PINMUX_GRP_T));
-
-  /* Enable peripheral clock */
+  
+  /* Configure port 3 as EMC data pins*/
+  port =3;
+  for(index=0; index<LPC178X_EMC_DATA_PINS; index++)
+  {
+    base.p[port][index] = (LPC_IOCON_BASE + (port) * 0x80 \
+                                          + (index) * 4);
+    Chip_IOCON_PinMuxSet(&base,port,index,LPC178X_GPIO_EMC_REGVAL);
+  }
+    
+  /* Configure port 4 as EMC address pins */
+  port = 4;
+  for(index=0; index<LPC178X_EMC_ADDR_PINS; index++)
+  {
+    base.p[port][index] = (LPC_IOCON_BASE + (port) * 0x80 \
+                                          + (index) * 4);
+    Chip_IOCON_PinMuxSet(&base,port,index,LPC178X_GPIO_EMC_REGVAL);
+  }
+    
+  /* Enable peripheral clock for EMC*/
   Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_EMC);
 
   /** Clock delay for EMC */
