@@ -50,12 +50,14 @@
 void Chip_SetupIrcClocking(void)
 {
 	/* Disconnect the Main PLL if it is connected already */
-	if (Chip_Clock_IsMainPLLConnected()) {
+	if (Chip_Clock_IsMainPLLConnected())
+	{
 		Chip_Clock_DisablePLL(SYSCTL_MAIN_PLL, SYSCTL_PLL_CONNECT);
 	}
 
 	/* Disable the PLL if it is enabled */
-	if (Chip_Clock_IsMainPLLEnabled()) {
+	if (Chip_Clock_IsMainPLLEnabled())
+	{
 		Chip_Clock_DisablePLL(SYSCTL_MAIN_PLL, SYSCTL_PLL_ENABLE);
 	}
 
@@ -68,7 +70,9 @@ void Chip_SetupIrcClocking(void)
 	Chip_Clock_EnablePLL(SYSCTL_MAIN_PLL, SYSCTL_PLL_ENABLE);
 
 	Chip_Clock_SetCPUClockDiv(2);
-	while (!Chip_Clock_IsMainPLLLocked()) {} /* Wait for the PLL to Lock */
+	while (!Chip_Clock_IsMainPLLLocked())
+	{
+	} /* Wait for the PLL to Lock */
 
 	Chip_Clock_EnablePLL(SYSCTL_MAIN_PLL, SYSCTL_PLL_CONNECT);
 }
@@ -76,19 +80,23 @@ void Chip_SetupIrcClocking(void)
 void Chip_SetupXtalClocking(void)
 {
 	/* Disconnect the Main PLL if it is connected already */
-	if (Chip_Clock_IsMainPLLConnected()) {
+	if (Chip_Clock_IsMainPLLConnected())
+	{
 		Chip_Clock_DisablePLL(SYSCTL_MAIN_PLL, SYSCTL_PLL_CONNECT);
 	}
 
 	/* Disable the PLL if it is enabled */
-	if (Chip_Clock_IsMainPLLEnabled()) {
+	if (Chip_Clock_IsMainPLLEnabled())
+	{
 		Chip_Clock_DisablePLL(SYSCTL_MAIN_PLL, SYSCTL_PLL_ENABLE);
 	}
 
 	/* Enable the crystal */
 	if (!Chip_Clock_IsCrystalEnabled())
 		Chip_Clock_EnableCrystal();
-	while(!Chip_Clock_IsCrystalEnabled()) {}
+	while (!Chip_Clock_IsCrystalEnabled())
+	{
+	}
 
 	/* Set PLL0 Source to Crystal Oscillator */
 	Chip_Clock_SetCPUClockDiv(0);
@@ -101,7 +109,9 @@ void Chip_SetupXtalClocking(void)
 
 	/* 384MHz / (3+1) = 96MHz */
 	Chip_Clock_SetCPUClockDiv(3);
-	while (!Chip_Clock_IsMainPLLLocked()) {} /* Wait for the PLL to Lock */
+	while (!Chip_Clock_IsMainPLLLocked())
+	{
+	} /* Wait for the PLL to Lock */
 
 	Chip_Clock_EnablePLL(SYSCTL_MAIN_PLL, SYSCTL_PLL_CONNECT);
 }
@@ -115,7 +125,8 @@ void Chip_SetupIrcClocking(void)
 	Chip_Clock_SetCPUClockSource(SYSCTL_CCLKSRC_SYSCLK);
 
 	/* Disable the PLL if it is enabled */
-	if (Chip_Clock_IsMainPLLEnabled()) {
+	if (Chip_Clock_IsMainPLLEnabled())
+	{
 		Chip_Clock_DisablePLL(SYSCTL_MAIN_PLL, SYSCTL_PLL_ENABLE);
 	}
 
@@ -128,7 +139,9 @@ void Chip_SetupIrcClocking(void)
 
 	Chip_Clock_EnablePLL(SYSCTL_MAIN_PLL, SYSCTL_PLL_ENABLE);
 	Chip_Clock_SetCPUClockDiv(1);
-	while (!Chip_Clock_IsMainPLLLocked()) {} /* Wait for the PLL to Lock */
+	while (!Chip_Clock_IsMainPLLLocked())
+	{
+	} /* Wait for the PLL to Lock */
 	Chip_Clock_SetCPUClockSource(SYSCTL_CCLKSRC_MAINPLL);
 
 	/* Peripheral clocking will be derived from PLL0 with a divider of 2 (60MHz) */
@@ -142,27 +155,32 @@ void Chip_SetupXtalClocking(void)
 	if (!Chip_Clock_IsCrystalEnabled())
 		Chip_Clock_EnableCrystal();
 
-	while(!Chip_Clock_IsCrystalEnabled()) {}
+	while (!Chip_Clock_IsCrystalEnabled())
+	{
+	}
 
 	/* Clock the CPU from SYSCLK, in case if it is clocked by PLL0 */
 	Chip_Clock_SetCPUClockSource(SYSCTL_CCLKSRC_SYSCLK);
 
 	/* Disable the PLL if it is enabled */
-	if (Chip_Clock_IsMainPLLEnabled()) {
+	if (Chip_Clock_IsMainPLLEnabled())
+	{
 		Chip_Clock_DisablePLL(SYSCTL_MAIN_PLL, SYSCTL_PLL_ENABLE);
 	}
 
 	/* It is safe to switch the PLL Source to Crystal Oscillator */
 	Chip_Clock_SetMainPLLSource(SYSCTL_PLLCLKSRC_MAINOSC);
 
-	/* FCCO = 12MHz * (9+1) * 2 * (0+1) = 240MHz */
-	/* Fout = FCCO / ((0+1) * 2) = 120MHz */
-	Chip_Clock_SetupPLL(SYSCTL_MAIN_PLL, 9, 0);
+	/* FCCO = 12MHz * (7+1) * 2 * (0+1) = 192MHz */
+	/* Fout = FCCO / ((0+1) * 2) = 96MHz */
+	Chip_Clock_SetupPLL(SYSCTL_MAIN_PLL, 7, 0);
 
 	Chip_Clock_EnablePLL(SYSCTL_MAIN_PLL, SYSCTL_PLL_ENABLE);
 	Chip_Clock_SetCPUClockDiv(1);
 
-	while (!Chip_Clock_IsMainPLLLocked()) {} /* Wait for the PLL to Lock */
+	while (!Chip_Clock_IsMainPLLLocked())
+	{
+	} /* Wait for the PLL to Lock */
 	Chip_Clock_SetCPUClockSource(SYSCTL_CCLKSRC_MAINPLL);
 
 	/* Peripheral clocking will be derived from PLL0 with a divider of 2 (60MHz) */

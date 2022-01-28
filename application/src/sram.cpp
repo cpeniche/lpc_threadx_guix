@@ -35,7 +35,8 @@
  * K4M513233 SDRAM: 32-bit, 4 banks, 13 rows, 9 cols.
  * See Table 133 "Address mapping" in the LPC178x/7x User Manual.
  */
-#define LPC178X_EMC_AM      0x8D
+//#define LPC178X_EMC_AM      0x8D
+#define LPC178X_EMC_AM      0x89
 
 /* Address mapping */
 #define LPC178X_EMC_DYCFG_AM_BITS   7
@@ -108,7 +109,7 @@ const PINMUX_GRP_T pin[] ={
 
 IP_EMC_DYN_CONFIG_T Sram_Default_Config  =
 {
-  .RefreshPeriod  = 0x1D,    /*!< Refresh period 7.8us/row */
+  .RefreshPeriod  = 7800,    /*!< Refresh period 7.8us/row */
   .ReadConfig     = 0x01,    /*!< Clock*/
   .tRP            = 9,    /*!< Precharge Command Period */
   .tRAS           = 25,    /*!< Active to Precharge Command Period */
@@ -147,7 +148,7 @@ void Sram_Init()
   
   /* Configure port 3 as EMC data pins*/
   port =3;
-  for(index=0; index<LPC178X_EMC_DATA_PINS; index++)
+  for(index=0; index<=LPC178X_EMC_DATA_PINS; index++)
   {
     base.p[port][index] = (LPC_IOCON_BASE + (port) * 0x80 \
                                           + (index) * 4);
@@ -156,7 +157,7 @@ void Sram_Init()
     
   /* Configure port 4 as EMC address pins */
   port = 4;
-  for(index=0; index<LPC178X_EMC_ADDR_PINS; index++)
+  for(index=0; index<=LPC178X_EMC_ADDR_PINS; index++)
   {
     base.p[port][index] = (LPC_IOCON_BASE + (port) * 0x80 \
                                           + (index) * 4);

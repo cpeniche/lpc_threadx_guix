@@ -9,6 +9,7 @@
 
 LPC_IOCON_T pinmux;  /* Hold the address of each IO_CON registers */
 uint16_t display_fb[800][480] __attribute__((section(".sram")));
+uint32_t test __attribute__((section(".sram")));
 LPC_LCD_T lcd_regs;
 
 const PINMUX_GRP_T pin[] =
@@ -89,6 +90,9 @@ void Display_Init_Pinmux()
 
 void Initialize_Display(void)
 {
+
+  uint16_t readback[10]={0};
+
 /*Initialize LCD pin out*/
 	Display_Init_Pinmux();
 
@@ -109,6 +113,15 @@ void Initialize_Display(void)
 	LPC_GPIO2->DIR |= 0x2;
 	LPC_GPIO2->SET |= 0x2;
 
-	memset(display_fb,0x5555, sizeof(display_fb));
+	//memset(display_fb,0x5555, sizeof(display_fb));
+  display_fb[0][0]=0x5555;
+  display_fb[0][1]=0xAAAA;
+  display_fb[0][2]=0xBBBB;
+  display_fb[0][3]=0xCCCC;
+
+  readback[0]= display_fb[0][0];
+  readback[1]= display_fb[0][1];
+  readback[2]= display_fb[0][2];
+  readback[3]= display_fb[0][3];
 
 }

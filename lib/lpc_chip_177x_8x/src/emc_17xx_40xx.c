@@ -106,6 +106,9 @@ void initDynMem(LPC_EMC_T *pEMC, IP_EMC_DYN_CONFIG_T *Dynamic_Config, uint32_t E
 	uint32_t ChipSelect, tmpclk;
 	int i;
 
+	/* Enable EMC control */
+	pEMC->CONTROL = 1<<0;
+
 	for (ChipSelect = 0; ChipSelect < Num_Sram; ChipSelect++) {
 
 		LPC_EMC_T *EMC_Reg_add = (LPC_EMC_T *) ((uint32_t) pEMC + (ChipSelect << 5));
@@ -183,9 +186,9 @@ void initDynMem(LPC_EMC_T *pEMC, IP_EMC_DYN_CONFIG_T *Dynamic_Config, uint32_t E
 
 	/* enable buffers */
 	pEMC->DYNAMICCONFIG0    |= 1 << 19;
-	pEMC->DYNAMICCONFIG1    |= 1 << 19;
+	/*pEMC->DYNAMICCONFIG1    |= 1 << 19;
 	pEMC->DYNAMICCONFIG2    |= 1 << 19;
-	pEMC->DYNAMICCONFIG3    |= 1 << 19;
+	pEMC->DYNAMICCONFIG3    |= 1 << 19;*/
 }
 
 /* Initializes the Static Controller according to the specified parameters

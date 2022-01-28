@@ -17,14 +17,9 @@ const uint32_t OscRateIn = 12000000;
 int main()
 {
   
-  uint32_t *Address = (uint32_t *)0xA00000000;
-  uint32_t readback =0;
-  
 	Chip_SystemInit();
   Sram_Init();
-  *Address = 0x55;
 	Initialize_Display();
-  readback = *Address;
 
   /* Enter the ThreadX kernel. */
   tx_kernel_enter( );
