@@ -1,176 +1,145 @@
 #include "chip.h"
 #include "chip_lpc177x_8x.h"
 #include "emc_17xx_40xx.h"
+#include "sram.h"
+#include "tx_api.h"
 
 
-/* EMC data pins (DQ0..DQ31) */
-#define LPC178X_EMC_DATA_PINS	31
+const PINMUX_GRP_T pin[] = {
+    /* Configure EMC bank address select 0 and 1 (BA0, BA1) */
+    {4, 13, LPC178X_GPIO_EMC_REGVAL},
+    {4, 14, LPC178X_GPIO_EMC_REGVAL},
 
-/* EMC row/column address pins (A0..A11) */
-#define LPC178X_EMC_ADDR_PINS	12
-/*
- * EMC Delay Control register
- */
-/* Programmable delay value for EMC outputs in command delayed mode */
-#define SCC_EMCDLYCTL_CMDDLY_BITS   0
-/*
- * Programmable delay value for the feedback clock that controls input data
- * sampling
- */
-#define SCC_EMCDLYCTL_FBCLKDLY_BITS 8
+    /* Configure EMC column address strobe (CAS) */
+    {2, 16, LPC178X_GPIO_EMC_REGVAL},
+    /* Configure EMC row address strobe (RAS) */
+    {2, 17, LPC178X_GPIO_EMC_REGVAL},
 
-/*
- * SDRAM-specific configuration
- */
-/*
- * Programmable delay value for EMC outputs in command delayed mode
- */
-#define LPC178X_EMC_CMDDLY  0x10
-/*
- * Programmable delay value for the feedback clock that controls input data
- * sampling
- */
-#define LPC178X_EMC_FBCLKDLY    0x10
-/*
- * K4M513233 SDRAM: 32-bit, 4 banks, 13 rows, 9 cols.
- * See Table 133 "Address mapping" in the LPC178x/7x User Manual.
- */
-//#define LPC178X_EMC_AM      0x8D
-#define LPC178X_EMC_AM      0x89
+    /* Configure EMC write enable (WE) */
+    {4, 25, LPC178X_GPIO_EMC_REGVAL},
 
-/* Address mapping */
-#define LPC178X_EMC_DYCFG_AM_BITS   7
+    /* Configure EMC clock input (CLK) */
+    {2, 18, LPC178X_GPIO_EMC_REGVAL},
+    /* Configure EMC clock enable (CKE) */
+    {2, 24, LPC178X_GPIO_EMC_REGVAL},
 
-/* First Sram Address */
-#define SRAM_ADDRESS 0xA0000000
+    /* Configure EMC chip select (DYCS0) */
+    {2, 20, LPC178X_GPIO_EMC_REGVAL},
 
-#define LPC178X_EMC_MODEREG_BL      2   /* Burst Length code */
-#define LPC178X_EMC_MODEREG_CAS     2   /* CAS Latency */
-
-/*
- * The SDRAM chip (K4M513233) mode register.
- * See K4M513233 datasheet
- */
-#define LPC178X_EMC_MODEREG_BL_BITS     0   /* Burst Length */
-#define LPC178X_EMC_MODEREG_CAS_BITS    4   /* CAS Latency */
-
-#define LPC178X_EMC_MODEREG_VALUE \
-    ((LPC178X_EMC_MODEREG_BL << LPC178X_EMC_MODEREG_BL_BITS) | \
-    (LPC178X_EMC_MODEREG_CAS << LPC178X_EMC_MODEREG_CAS_BITS))
-
-/*
- * Offset of the 12 least-significant bits of mode register (A0..A11)
- * in addresses on the AHB bus.
- *
- * In the high-performance mode the shift should be the following:
- * 13 = 9 (column bits) + 2 (bank select bits) + 2 (32 bits)
- *    1. K4M513233 SDRAM has 512 columns, therefore 9 bits are used for the column number.
- *    2. Bank select field has 2 bits.
- *    3. `2` is log2(32/8), because the SDRAM chip is 32-bit, and its
- *        internal addresses do not have 2 least-significant bits of
- *        the AHB bus addresses.
- *
- * In the low-power mode this shift will be different.
- */
-
-#define LPC178X_GPIO_EMC_REGVAL \
-	(FUNC1 | IOCON_MODE_INACT | IOCON_FASTSLEW_EN)
-
-
-
-const PINMUX_GRP_T pin[] ={
-  /* Configure EMC bank address select 0 and 1 (BA0, BA1) */
-	{4, 13, LPC178X_GPIO_EMC_REGVAL},
-	{4, 14, LPC178X_GPIO_EMC_REGVAL},
-
-	/* Configure EMC column address strobe (CAS) */
-	{2, 16, LPC178X_GPIO_EMC_REGVAL},
-	/* Configure EMC row address strobe (RAS) */
-	{2, 17, LPC178X_GPIO_EMC_REGVAL},
-
-	/* Configure EMC write enable (WE) */
-	{4, 25, LPC178X_GPIO_EMC_REGVAL},
-
-	/* Configure EMC clock input (CLK) */
-	{2, 18, LPC178X_GPIO_EMC_REGVAL},
-	/* Configure EMC clock enable (CKE) */
-	{2, 24, LPC178X_GPIO_EMC_REGVAL},
-
-	/* Configure EMC chip select (DYCS0) */
-	{2, 20, LPC178X_GPIO_EMC_REGVAL},
-
-	/* Configure EMC I/O mask (DQM0..DQM3) */
-	{2, 28, LPC178X_GPIO_EMC_REGVAL},
-	{2, 29, LPC178X_GPIO_EMC_REGVAL},
-	{2, 30, LPC178X_GPIO_EMC_REGVAL},
-	{2, 31, LPC178X_GPIO_EMC_REGVAL},
-
+    /* Configure EMC I/O mask (DQM0..DQM3) */
+    {2, 28, LPC178X_GPIO_EMC_REGVAL},
+    {2, 29, LPC178X_GPIO_EMC_REGVAL},
+    {2, 30, LPC178X_GPIO_EMC_REGVAL},
+    {2, 31, LPC178X_GPIO_EMC_REGVAL},
 };
 
-IP_EMC_DYN_CONFIG_T Sram_Default_Config  =
-{
-  .RefreshPeriod  = 7800,    /*!< Refresh period 7.8us/row */
-  .ReadConfig     = 0x01,    /*!< Clock*/
-  .tRP            = 9,    /*!< Precharge Command Period */
-  .tRAS           = 25,    /*!< Active to Precharge Command Period */
-  .tSREX          = 35,    /*!< Self Refresh Exit Time */
-  .tAPR           = 20,    /*!< Last Data Out to Active Time */
-  .tDAL           = 20,    /*!< Data In to Active Command Time */
-  .tWR            = 20,    /*!< Write Recovery Time */
-  .tRC            = 33,    /*!< Active to Active Command Period */
-  .tRFC           = 35,    /*!< Auto-refresh Period */
-  .tXSR           = 35,    /*!< Exit Selt Refresh */
-  .tRRD           = 12,    /*!< Active Bank A to Active Bank B Time */
-  .tMRD           = 2,    /*!< Load Mode register command to Active Command */
-  .DevConfig =
-  {
-    0xA0000000,     /*!< Base Address */
-    0x02,      /*!< RAS value */
-    LPC178X_EMC_MODEREG_VALUE,  /*!< Mode Register value */
-    (LPC178X_EMC_AM << LPC178X_EMC_DYCFG_AM_BITS)
-  }
-};
 
-/******************************************/
+/*************************************************************/
 void Sram_Init()
 {
-  uint32_t index=0,port=0, base_addr;
-  LPC_IOCON_T base={0};
+  uint32_t index = 0, port = 0, base_addr;
+  LPC_IOCON_T base = {0};
+	uint32_t tmp32;
 
+
+  /* Clock delay for EMC */
+
+  LPC_SYSCON->EMCDLYCTL = (LPC178X_EMC_CMDDLY << LPC178X_SCC_EMCDLYCTL_CMDDLY_BITS) |
+		(LPC178X_EMC_FBCLKDLY << LPC178X_SCC_EMCDLYCTL_FBCLKDLY_BITS);
+
+	 /* Enable EMC*/
+
+  Chip_EMC_Init(1,EMC_CONFIG_ENDIAN_LITTLE);
+  
   /* Configure pins as table pin[] */
-  for(index=0; index<(sizeof(pin)/sizeof(PINMUX_GRP_T)); index++)
+
+  for (index = 0; index < (sizeof(pin) / sizeof(PINMUX_GRP_T)); index++)
   {
-    base.p[pin[index].pingrp][pin[index].pinnum] = (LPC_IOCON_BASE + (pin[index].pingrp) * 0x80 \
-                                                                   + (pin[index].pinnum) * 4);
+    base.p[pin[index].pingrp][pin[index].pinnum] = (LPC_IOCON_BASE + (pin[index].pingrp) * 0x80 + (pin[index].pinnum) * 4);
   }
 
   Chip_IOCON_SetPinMuxing(&base, pin, sizeof(pin) / sizeof(PINMUX_GRP_T));
-  
+
   /* Configure port 3 as EMC data pins*/
-  port =3;
-  for(index=0; index<=LPC178X_EMC_DATA_PINS; index++)
+  port = 3;
+  for (index = 0; index <= LPC178X_EMC_DATA_PINS; index++)
   {
-    base.p[port][index] = (LPC_IOCON_BASE + (port) * 0x80 \
-                                          + (index) * 4);
-    Chip_IOCON_PinMuxSet(&base,port,index,LPC178X_GPIO_EMC_REGVAL);
+    base.p[port][index] = (LPC_IOCON_BASE + (port)*0x80 + (index)*4);
+    Chip_IOCON_PinMuxSet(&base, port, index, LPC178X_GPIO_EMC_REGVAL);
   }
-    
+
   /* Configure port 4 as EMC address pins */
   port = 4;
-  for(index=0; index<=LPC178X_EMC_ADDR_PINS; index++)
+  for (index = 0; index <= LPC178X_EMC_ADDR_PINS; index++)
   {
-    base.p[port][index] = (LPC_IOCON_BASE + (port) * 0x80 \
-                                          + (index) * 4);
-    Chip_IOCON_PinMuxSet(&base,port,index,LPC178X_GPIO_EMC_REGVAL);
+    base.p[port][index] = (LPC_IOCON_BASE + (port)*0x80 + (index)*4);
+    Chip_IOCON_PinMuxSet(&base, port, index, LPC178X_GPIO_EMC_REGVAL);
   }
-    
+
   /* Enable peripheral clock for EMC*/
   Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_EMC);
 
-  /** Clock delay for EMC */
-  LPC_SYSCTL->EMCDLYCTL = (LPC178X_EMC_CMDDLY << SCC_EMCDLYCTL_CMDDLY_BITS) |
-                          (LPC178X_EMC_FBCLKDLY << SCC_EMCDLYCTL_FBCLKDLY_BITS);
+	/* Address mapping (see Table 133 from the LPC178x/7x User Manual)*/
+	 
+  LPC_EMC->DYNAMICCONFIG0 = EMC_DYN_CONFIG_8Mx16_4BANKS_12ROWS_9COLS | 1<<14;
 
-  Chip_EMC_Dynamic_Init(&Sram_Default_Config,1);
+
+	/* Configure DRAM timing*/
+
+  LPC_EMC->DYNAMICRASCAS0 =
+		(LPC178X_EMC_RAS << LPC178X_EMC_DYRASCAS_RAS_BITS) |
+		(LPC178X_EMC_CAS << LPC178X_EMC_DYRASCAS_CAS_BITS);
+
+  LPC_EMC->DYNAMICREADCONFIG = (LPC178X_EMC_RDCFG_RD << LPC178X_EMC_DYRDCFG_RD_BITS);
+  LPC_EMC->DYNAMICRP = LPC178X_EMC_T_RP - 1;
+  LPC_EMC->DYNAMICRAS =LPC178X_EMC_T_RAS - 1;
+	LPC_EMC->DYNAMICSREX = LPC178X_EMC_T_SREX - 1; 
+	LPC_EMC->DYNAMICAPR  = LPC178X_EMC_T_APR - 1; 
+	LPC_EMC->DYNAMICDAL  = LPC178X_EMC_T_DAL; 
+	LPC_EMC->DYNAMICWR   = LPC178X_EMC_T_WR - 1; 
+	LPC_EMC->DYNAMICRC   = LPC178X_EMC_T_RC - 1; 
+	LPC_EMC->DYNAMICRFC  = LPC178X_EMC_T_RFC - 1; 
+	LPC_EMC->DYNAMICXSR  = LPC178X_EMC_T_XSR - 1; 
+	LPC_EMC->DYNAMICRRD  = LPC178X_EMC_T_RRD - 1;  
+	LPC_EMC->DYNAMICMRD  = LPC178X_EMC_T_MRD - 1;
+	tx_thread_sleep(1);
+	
+	 /* Issue SDRAM NOP (no operation) command*/ 
+	
+  LPC_EMC->DYNAMICCONTROL =
+		LPC178X_EMC_DYCTRL_CE_MSK | LPC178X_EMC_DYCTRL_CS_MSK |
+		(LPC178X_EMC_DYCTRL_I_NOP << LPC178X_EMC_DYCTRL_I_BITS);
+	tx_thread_sleep(1);
+
+	/* Pre-charge all with fast refresh*/
+	
+  LPC_EMC->DYNAMICCONTROL =
+		LPC178X_EMC_DYCTRL_CE_MSK | LPC178X_EMC_DYCTRL_CS_MSK |
+		(LPC178X_EMC_DYCTRL_I_PALL << LPC178X_EMC_DYCTRL_I_BITS);
+	LPC_EMC->DYNAMICREFRESH = LPC178X_EMC_REFRESH_FAST; 
+	tx_thread_sleep(1);
+
+	/* Set refresh period*/
+
+  LPC_EMC->DYNAMICREFRESH = LPC178X_EMC_REFRESH;
+
+	/* Load mode word, CAS2, burst of 4*/
+	
+  LPC_EMC->DYNAMICCONTROL = LPC178X_EMC_DYCTRL_CE_MSK | LPC178X_EMC_DYCTRL_CS_MSK |
+		                        (LPC178X_EMC_DYCTRL_I_MODE << LPC178X_EMC_DYCTRL_I_BITS);
+
+/*Send configuration to the sram */
+
+	tmp32 = *(volatile uint32_t *)(0xA0000000 | (LPC178X_EMC_MODEREG_VALUE << LPC178X_EMC_MODEREG_ADDR_SHIFT));
+
+	/* Normal mode */
+	
+  LPC_EMC->DYNAMICCONTROL =
+		(LPC178X_EMC_DYCTRL_I_NORMAL << LPC178X_EMC_DYCTRL_I_BITS);
+
+	/* Enable DRAM buffer*/
+	 
+  LPC_EMC->DYNAMICCONFIG0 =
+  (LPC178X_EMC_AM << LPC178X_EMC_DYCFG_AM_BITS) | LPC178X_EMC_DYCFG_B_MSK;
 
 }

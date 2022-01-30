@@ -30,6 +30,7 @@
  */
 
 #include "chip.h"
+#include "tx_api.h"
 
 #if defined(CHIP_LPC177X_8X) || defined(CHIP_LPC40XX)
 
@@ -103,11 +104,11 @@ STATIC uint32_t getColsLen(uint32_t DynConfig)
    in the IP_EMC_DYN_CONFIG_T */
 void initDynMem(LPC_EMC_T *pEMC, IP_EMC_DYN_CONFIG_T *Dynamic_Config, uint32_t EMC_Clock, uint8_t Num_Sram)
 {
-	uint32_t ChipSelect, tmpclk;
+	uint32_t ChipSelect, tmpclk, temp;
 	int i;
 
 	/* Enable EMC control */
-	pEMC->CONTROL = 1<<0;
+	Chip_EMC_Enable(1);
 
 	for (ChipSelect = 0; ChipSelect < Num_Sram; ChipSelect++) {
 
@@ -132,28 +133,34 @@ void initDynMem(LPC_EMC_T *pEMC, IP_EMC_DYN_CONFIG_T *Dynamic_Config, uint32_t E
 	pEMC->DYNAMICRRD        = convertTimmingParam(EMC_Clock, Dynamic_Config->tRRD, 1);
 	pEMC->DYNAMICMRD        = convertTimmingParam(EMC_Clock, Dynamic_Config->tMRD, 1);
 
+	
+	tx_thread_sleep(1);
+	
 	/* TIM_Waitus(100); */
 	/*FIXME: if Timer driver is ready, it should replace below "for" delay technic */
-	for (i = 0; i < 1000; i++) {	/* wait 100us */
-	}
+	//for (i = 0; i < 1000; i++) {}	/* wait 100us */
+	
 	pEMC->DYNAMICCONTROL    = 0x00000183;	/* Issue NOP command */
 
 	/* TIM_Waitus(200); */						   /* wait 200us */
 	/*FIXME: if Timer driver is ready, it should replace below "for" delay technic */
-	for (i = 0; i < 1000; i++) {}
+	tx_thread_sleep(1);
+	//for (i = 0; i < 1000; i++) {}
 	pEMC->DYNAMICCONTROL    = 0x00000103;	/* Issue PALL command */
 
 	pEMC->DYNAMICREFRESH = 2;	/* ( 2 * 16 ) -> 32 clock cycles */
 
 	/* FIXME: TIM_Waitus(200); */						   /* wait 200us */
-	for (i = 0; i < 80; i++) {}
-
-	tmpclk = EMC_DIV_ROUND_UP(convertTimmingParam(EMC_Clock, Dynamic_Config->RefreshPeriod, 0), 16);
-	pEMC->DYNAMICREFRESH    = tmpclk;
+	//for (i = 0; i < 80; i++) {}
+	tx_thread_sleep(1);
+	//tmpclk = EMC_DIV_ROUND_UP(convertTimmingParam(EMC_Clock, Dynamic_Config->RefreshPeriod, 0), 16);
+	pEMC->DYNAMICREFRESH    = 0x2e;
 
 	pEMC->DYNAMICCONTROL    = 0x00000083;	/* Issue MODE command */
 
+	temp = *((volatile uint32_t *) (0xA0000000 | (0x44000 << 13)));
 
+#if 0
 	for (ChipSelect = 0; ChipSelect < Num_Sram; ChipSelect++) {
 		/*uint32_t burst_length;*/
 		uint32_t DynAddr;
@@ -181,6 +188,7 @@ void initDynMem(LPC_EMC_T *pEMC, IP_EMC_DYN_CONFIG_T *Dynamic_Config, uint32_t E
 			temp = temp;
 		}
 	}
+#endif
 
 	pEMC->DYNAMICCONTROL    = 0x00000000;	/* Issue NORMAL command */
 
@@ -277,6 +285,7 @@ void Chip_EMC_LowPowerMode(uint8_t Enable)
 }
 
 /* Initialize EMC */
+#ifndef CHIP_LPC177X_8X
 void Chip_EMC_Init(uint32_t Enable, uint32_t ClockRatio, uint32_t EndianMode)
 {
 	LPC_EMC->CONFIG    = (EndianMode ? 1 : 0) | ((ClockRatio ? 1 : 0) << 8);
@@ -284,5 +293,14 @@ void Chip_EMC_Init(uint32_t Enable, uint32_t ClockRatio, uint32_t EndianMode)
 	/* Enable EMC 001 Normal Memory Map, No low power mode */
 	LPC_EMC->CONTROL     = (Enable ? 1 : 0);
 }
+#else
+void Chip_EMC_Init(uint32_t Enable, uint32_t EndianMode)
+{
+	LPC_EMC->CONFIG    = (EndianMode ? 1 : 0);
+
+	/* Enable EMC 001 Normal Memory Map, No low power mode */
+	LPC_EMC->CONTROL     = (Enable ? 1 : 0);
+}
+#endif
 
 #endif /* defined(CHIP_LPC177X_8X) || defined(CHIP_LPC40XX) */

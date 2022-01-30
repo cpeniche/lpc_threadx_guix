@@ -335,7 +335,11 @@ void Chip_EMC_LowPowerMode(uint8_t Enable);
  * @param	EndianMode	: Endian Mode, 0 = Little, 1 = Big
  * @return	None
  */
+#ifndef CHIP_LPC177X_8X
 void Chip_EMC_Init(uint32_t Enable, uint32_t ClockRatio, uint32_t EndianMode);
+#else
+void Chip_EMC_Init(uint32_t Enable, uint32_t EndianMode);
+#endif
 
 /**
  * @brief	Set Static Memory Extended Wait in Clock

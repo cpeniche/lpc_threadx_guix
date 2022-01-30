@@ -171,9 +171,9 @@ void Chip_SetupXtalClocking(void)
 	/* It is safe to switch the PLL Source to Crystal Oscillator */
 	Chip_Clock_SetMainPLLSource(SYSCTL_PLLCLKSRC_MAINOSC);
 
-	/* FCCO = 12MHz * (7+1) * 2 * (0+1) = 192MHz */
-	/* Fout = FCCO / ((0+1) * 2) = 96MHz */
-	Chip_Clock_SetupPLL(SYSCTL_MAIN_PLL, 7, 0);
+	/* FCCO = 12MHz * (8+1) * 2 * (0+1) = 216MHz */
+	/* Fout = FCCO / ((0+1) * 2) = 108MHz */
+	Chip_Clock_SetupPLL(SYSCTL_MAIN_PLL, 8, 0);
 
 	Chip_Clock_EnablePLL(SYSCTL_MAIN_PLL, SYSCTL_PLL_ENABLE);
 	Chip_Clock_SetCPUClockDiv(1);
@@ -185,6 +185,8 @@ void Chip_SetupXtalClocking(void)
 
 	/* Peripheral clocking will be derived from PLL0 with a divider of 2 (60MHz) */
 	Chip_Clock_SetPCLKDiv(2);
+	
+	Chip_Clock_SetEMCClockDiv(SYSCTL_EMC_DIV2);
 }
 #endif
 

@@ -108,6 +108,7 @@ typedef struct {
 #define FUNC1					0x1				/** Function 1  */
 #define FUNC2					0x2				/** Function 2	*/
 #define FUNC3					0x3				/** Function 3	*/
+#define FUNC4					0x4				/** Function 4	*/
 #if defined(CHIP_LPC175X_6X)
 #define MD_PLN					(0x2)
 #define MD_PDN					(0x3)
