@@ -39,7 +39,7 @@ class Display
         .HBP = 2,                            /*!< Horizontal back porch in clocks */
         .HFP = 2,                            /*!< Horizontal front porch in clocks */
         .HSW = 41,                            /*!< HSYNC pulse width in clocks */
-        .PPL = 400,                           /*!< Pixels per line */
+        .PPL = 480,                           /*!< Pixels per line */
         .VBP = 2,                            /*!< Vertical back porch in lines */
         .VFP = 2,                            /*!< Vertical front porch in lines */
         .VSW = 10,                             /*!< VSYNC pulse width in lines */
