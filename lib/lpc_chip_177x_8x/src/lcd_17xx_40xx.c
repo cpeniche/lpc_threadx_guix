@@ -64,17 +64,11 @@ void Chip_LCD_Init(LPC_LCD_T *pLCD, LCD_CONFIG_T *LCD_ConfigStruct)
 	pLCD->CTRL &= ~CLCDC_LCDCTRL_ENABLE;
 
 	/* Setting LCD_TIMH register */
-	regValue = ( ((((LCD_ConfigStruct->PPL / 16) - 1) & 0x3F) << 2)
-				 |         (( (LCD_ConfigStruct->HSW - 1)    & 0xFF) << 8)
-				 |         (( (LCD_ConfigStruct->HFP - 1)    & 0xFF) << 16)
-				 |         (( (LCD_ConfigStruct->HBP - 1)    & 0xFF) << 24) );
+	regValue = (((((LCD_ConfigStruct->PPL / 16) - 1) & 0x3F) << 2) | (((LCD_ConfigStruct->HSW - 1) & 0xFF) << 8) | (((LCD_ConfigStruct->HFP - 1) & 0xFF) << 16) | (((LCD_ConfigStruct->HBP - 1) & 0xFF) << 24));
 	pLCD->TIMH = regValue;
 
 	/* Setting LCD_TIMV register */
-	regValue = ((((LCD_ConfigStruct->LPP - 1) & 0x3FF) << 0)
-				|        (((LCD_ConfigStruct->VSW - 1) & 0x03F) << 10)
-				|        (((LCD_ConfigStruct->VFP - 1) & 0x0FF) << 16)
-				|        (((LCD_ConfigStruct->VBP - 1) & 0x0FF) << 24) );
+	regValue = ((((LCD_ConfigStruct->LPP - 1) & 0x3FF) << 0) | (((LCD_ConfigStruct->VSW - 1) & 0x03F) << 10) | (((LCD_ConfigStruct->VFP - 1) & 0x0FF) << 16) | (((LCD_ConfigStruct->VBP - 1) & 0x0FF) << 24));
 	pLCD->TIMV = regValue;
 
 	/* Generate the clock and signal polarity control word */
@@ -86,7 +80,8 @@ void Chip_LCD_Init(LPC_LCD_T *pLCD, LCD_CONFIG_T *LCD_ConfigStruct)
 	regValue |= (LCD_ConfigStruct->IVS & 1) << 11;
 
 	/* Compute clocks per line based on panel type */
-	switch (LCD_ConfigStruct->LCD) {
+	switch (LCD_ConfigStruct->LCD)
+	{
 	case LCD_MONO_4:
 		regValue |= ((((LCD_ConfigStruct->PPL / 4) - 1) & 0x3FF) << 16);
 		break;
@@ -101,13 +96,14 @@ void Chip_LCD_Init(LPC_LCD_T *pLCD, LCD_CONFIG_T *LCD_ConfigStruct)
 
 	case LCD_TFT:
 	default:
-		regValue |=	 /*1<<26 |*/ (((LCD_ConfigStruct->PPL - 1) & 0x3FF) << 16);
+		regValue |= /*1<<26 |*/ (((LCD_ConfigStruct->PPL - 1) & 0x3FF) << 16);
+		pLCD->CTRL |= 1 << 5;
 	}
 
 	/* panel clock divisor */
-	pcd = 5;// LCD_ConfigStruct->pcd;   /* TODO: should be calculated from LCDDCLK */
+	pcd = 7; // LCD_ConfigStruct->pcd;   /* TODO: should be calculated from LCDDCLK */
 	pcd &= 0x3FF;
-	regValue |=  ((pcd >> 5) << 27) | ((pcd) & 0x1F);
+	regValue |= ((pcd >> 5) << 27) | ((pcd)&0x1F);
 	pLCD->POL = regValue;
 
 	/* disable interrupts */
@@ -118,15 +114,16 @@ void Chip_LCD_Init(LPC_LCD_T *pLCD, LCD_CONFIG_T *LCD_ConfigStruct)
 
 	/* set color format RGB */
 	regValue |= LCD_ConfigStruct->color_format << 8;
-	regValue |= LCD_ConfigStruct->LCD << 5;
-	if (LCD_ConfigStruct->Dual == 1) {
+	if (LCD_ConfigStruct->Dual == 1)
+	{
 		regValue |= 1 << 7;
 	}
-	pLCD->CTRL = regValue;
+	pLCD->CTRL |= regValue;
 
-	/* clear palette */
-	pPal = (uint32_t *) (&(pLCD->PAL));
-	for (i = 0; i < 128; i++) {
+		/* clear palette */
+		pPal = (uint32_t *)(&(pLCD->PAL));
+	for (i = 0; i < 128; i++)
+	{
 		*pPal = 0;
 		pPal++;
 	}
@@ -149,21 +146,24 @@ void Chip_LCD_Cursor_Config(LPC_LCD_T *pLCD, LCD_CURSOR_SIZE_OPT_T cursor_size, 
 void Chip_LCD_Cursor_WriteImage(LPC_LCD_T *pLCD, uint8_t cursor_num, void *Image)
 {
 	int i, j;
-	uint32_t *fifoptr, *crsr_ptr = (uint32_t *) Image;
+	uint32_t *fifoptr, *crsr_ptr = (uint32_t *)Image;
 
 	/* Check if Cursor Size was configured as 32x32 or 64x64*/
-	if (LCD_Cursor_Size == LCD_CURSOR_32x32) {
+	if (LCD_Cursor_Size == LCD_CURSOR_32x32)
+	{
 		i = cursor_num * 64;
 		j = i + 64;
 	}
-	else {
+	else
+	{
 		i = 0;
 		j = 256;
 	}
-	fifoptr = (void *) &(pLCD->CRSR_IMG[0]);
+	fifoptr = (void *)&(pLCD->CRSR_IMG[0]);
 
 	/* Copy Cursor Image content to FIFO */
-	for (; i < j; i++) {
+	for (; i < j; i++)
+	{
 
 		*fifoptr = *crsr_ptr;
 		crsr_ptr++;
@@ -189,21 +189,22 @@ void Chip_LCD_LoadPalette(LPC_LCD_T *pLCD, void *palette)
 	   31:24 - Not used
 	   arg = pointer to input palette table address */
 	ptr_pal_entry = &pal_entry;
-	pal_ptr = (uint8_t *) palette;
+	pal_ptr = (uint8_t *)palette;
 
 	/* 256 entry in the palette table */
-	for (i = 0; i < 256 / 2; i++) {
-		pal_entry.Bl = (*pal_ptr++) >> 3;	/* blue first */
-		pal_entry.Gl = (*pal_ptr++) >> 3;	/* get green */
-		pal_entry.Rl = (*pal_ptr++) >> 3;	/* get red */
-		pal_ptr++;	/* skip over the unused byte */
+	for (i = 0; i < 256 / 2; i++)
+	{
+		pal_entry.Bl = (*pal_ptr++) >> 3; /* blue first */
+		pal_entry.Gl = (*pal_ptr++) >> 3; /* get green */
+		pal_entry.Rl = (*pal_ptr++) >> 3; /* get red */
+		pal_ptr++;						  /* skip over the unused byte */
 		/* do the most significant halfword of the palette */
-		pal_entry.Bu = (*pal_ptr++) >> 3;	/* blue first */
-		pal_entry.Gu = (*pal_ptr++) >> 3;	/* get green */
-		pal_entry.Ru = (*pal_ptr++) >> 3;	/* get red */
-		pal_ptr++;	/* skip over the unused byte */
+		pal_entry.Bu = (*pal_ptr++) >> 3; /* blue first */
+		pal_entry.Gu = (*pal_ptr++) >> 3; /* get green */
+		pal_entry.Ru = (*pal_ptr++) >> 3; /* get red */
+		pal_ptr++;						  /* skip over the unused byte */
 
-		pLCD->PAL[i] = *((uint32_t *) ptr_pal_entry);
+		pLCD->PAL[i] = *((uint32_t *)ptr_pal_entry);
 	}
 }
 

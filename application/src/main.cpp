@@ -13,12 +13,16 @@ ULONG class_driver_index;
 UINT status;
 CHAR main_thread_name[] = "main thread";
 const uint32_t OscRateIn = 12000000;
-uint16_t test[4] __attribute__((section(".sram")));
+Memory Sram;
+Display TFT_lcd;
 
 int main()
 {
 
   Chip_SystemInit();
+
+  Sram.IO_config();
+  TFT_lcd.IO_Config();  
   /* Enter the ThreadX kernel. */
   tx_kernel_enter();
 }
@@ -43,14 +47,10 @@ void main_thread_entry(ULONG arg)
 
   UINT i = 0;
 
-  Sram_Init();
+  Sram.Init(tx_thread_sleep);
+  TFT_lcd.Init();
 
   while (1)
   {
-    
-    test[0]=0xBBBB;
-    test[1]=0x3333;
-    test[2]=0x8888;
-    test[3]=0x7777;
   }
 }

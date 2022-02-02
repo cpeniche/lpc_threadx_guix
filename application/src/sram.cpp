@@ -5,54 +5,20 @@
 #include "tx_api.h"
 
 
-const PINMUX_GRP_T pin[] = {
-    /* Configure EMC bank address select 0 and 1 (BA0, BA1) */
-    {4, 13, LPC178X_GPIO_EMC_REGVAL},
-    {4, 14, LPC178X_GPIO_EMC_REGVAL},
+Memory::Memory(/* args */)
+{
+}
 
-    /* Configure EMC column address strobe (CAS) */
-    {2, 16, LPC178X_GPIO_EMC_REGVAL},
-    /* Configure EMC row address strobe (RAS) */
-    {2, 17, LPC178X_GPIO_EMC_REGVAL},
+Memory::~Memory()
+{
+}
 
-    /* Configure EMC write enable (WE) */
-    {4, 25, LPC178X_GPIO_EMC_REGVAL},
-
-    /* Configure EMC clock input (CLK) */
-    {2, 18, LPC178X_GPIO_EMC_REGVAL},
-    /* Configure EMC clock enable (CKE) */
-    {2, 24, LPC178X_GPIO_EMC_REGVAL},
-
-    /* Configure EMC chip select (DYCS0) */
-    {2, 20, LPC178X_GPIO_EMC_REGVAL},
-
-    /* Configure EMC I/O mask (DQM0..DQM3) */
-    {2, 28, LPC178X_GPIO_EMC_REGVAL},
-    {2, 29, LPC178X_GPIO_EMC_REGVAL},
-    {2, 30, LPC178X_GPIO_EMC_REGVAL},
-    {2, 31, LPC178X_GPIO_EMC_REGVAL},
-};
-
-
-/*************************************************************/
-void Sram_Init()
+void Memory::IO_config()
 {
   uint32_t index = 0, port = 0, base_addr;
   LPC_IOCON_T base = {0};
-	uint32_t tmp32;
-
-
-  /* Clock delay for EMC */
-
-  LPC_SYSCON->EMCDLYCTL = (LPC178X_EMC_CMDDLY << LPC178X_SCC_EMCDLYCTL_CMDDLY_BITS) |
-		(LPC178X_EMC_FBCLKDLY << LPC178X_SCC_EMCDLYCTL_FBCLKDLY_BITS);
-
-	 /* Enable EMC*/
-
-  Chip_EMC_Init(1,EMC_CONFIG_ENDIAN_LITTLE);
   
   /* Configure pins as table pin[] */
-
   for (index = 0; index < (sizeof(pin) / sizeof(PINMUX_GRP_T)); index++)
   {
     base.p[pin[index].pingrp][pin[index].pinnum] = (LPC_IOCON_BASE + (pin[index].pingrp) * 0x80 + (pin[index].pinnum) * 4);
@@ -76,6 +42,22 @@ void Sram_Init()
     Chip_IOCON_PinMuxSet(&base, port, index, LPC178X_GPIO_EMC_REGVAL);
   }
 
+}
+
+void Memory::Init(unsigned int (*delay)(uint32_t time))
+{
+
+  uint32_t tmp32;
+
+  /* Clock delay for EMC */
+
+  LPC_SYSCON->EMCDLYCTL = (LPC178X_EMC_CMDDLY << LPC178X_SCC_EMCDLYCTL_CMDDLY_BITS) |
+		(LPC178X_EMC_FBCLKDLY << LPC178X_SCC_EMCDLYCTL_FBCLKDLY_BITS);
+
+	 /* Enable EMC*/
+
+  Chip_EMC_Init(1,EMC_CONFIG_ENDIAN_LITTLE);
+  
   /* Enable peripheral clock for EMC*/
   Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_EMC);
 
@@ -102,14 +84,14 @@ void Sram_Init()
 	LPC_EMC->DYNAMICXSR  = LPC178X_EMC_T_XSR - 1; 
 	LPC_EMC->DYNAMICRRD  = LPC178X_EMC_T_RRD - 1;  
 	LPC_EMC->DYNAMICMRD  = LPC178X_EMC_T_MRD - 1;
-	tx_thread_sleep(1);
+	delay(1);
 	
 	 /* Issue SDRAM NOP (no operation) command*/ 
 	
   LPC_EMC->DYNAMICCONTROL =
 		LPC178X_EMC_DYCTRL_CE_MSK | LPC178X_EMC_DYCTRL_CS_MSK |
 		(LPC178X_EMC_DYCTRL_I_NOP << LPC178X_EMC_DYCTRL_I_BITS);
-	tx_thread_sleep(1);
+	delay(1);
 
 	/* Pre-charge all with fast refresh*/
 	
@@ -117,7 +99,7 @@ void Sram_Init()
 		LPC178X_EMC_DYCTRL_CE_MSK | LPC178X_EMC_DYCTRL_CS_MSK |
 		(LPC178X_EMC_DYCTRL_I_PALL << LPC178X_EMC_DYCTRL_I_BITS);
 	LPC_EMC->DYNAMICREFRESH = LPC178X_EMC_REFRESH_FAST; 
-	tx_thread_sleep(1);
+	delay(1);
 
 	/* Set refresh period*/
 
@@ -143,3 +125,7 @@ void Sram_Init()
   (LPC178X_EMC_AM << LPC178X_EMC_DYCFG_AM_BITS) | LPC178X_EMC_DYCFG_B_MSK;
 
 }
+
+
+
+

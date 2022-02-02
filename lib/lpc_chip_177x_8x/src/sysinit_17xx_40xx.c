@@ -183,7 +183,7 @@ void Chip_SetupXtalClocking(void)
 	} /* Wait for the PLL to Lock */
 	Chip_Clock_SetCPUClockSource(SYSCTL_CCLKSRC_MAINPLL);
 
-	/* Peripheral clocking will be derived from PLL0 with a divider of 2 (60MHz) */
+	/* Peripheral clocking will be derived from PLL0 with a divider of 2 (54MHz) */
 	Chip_Clock_SetPCLKDiv(2);
 	
 	Chip_Clock_SetEMCClockDiv(SYSCTL_EMC_DIV2);

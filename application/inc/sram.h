@@ -1,9 +1,6 @@
 #ifndef __SRAM_H__
 #define __SRAM_H__
 
-
-
-
 /* EMC data pins (DQ0..DQ31) */
 #define LPC178X_EMC_DATA_PINS 31
 
@@ -182,8 +179,42 @@
 #define LPC178X_SCC_BASE		(LPC178X_APB1PERIPH_BASE + 0x0007C000)
 
 
+class Memory
+{
+  private:
+  /* data */
+  const PINMUX_GRP_T pin[12] = {
+    /* Configure EMC bank address select 0 and 1 (BA0, BA1) */
+    {4, 13, LPC178X_GPIO_EMC_REGVAL},
+    {4, 14, LPC178X_GPIO_EMC_REGVAL},
 
+    /* Configure EMC column address strobe (CAS) */
+    {2, 16, LPC178X_GPIO_EMC_REGVAL},
+    /* Configure EMC row address strobe (RAS) */
+    {2, 17, LPC178X_GPIO_EMC_REGVAL},
 
-extern void Sram_Init();
+    /* Configure EMC write enable (WE) */
+    {4, 25, LPC178X_GPIO_EMC_REGVAL},
+
+    /* Configure EMC clock input (CLK) */
+    {2, 18, LPC178X_GPIO_EMC_REGVAL},
+    /* Configure EMC clock enable (CKE) */
+    {2, 24, LPC178X_GPIO_EMC_REGVAL},
+
+    /* Configure EMC chip select (DYCS0) */
+    {2, 20, LPC178X_GPIO_EMC_REGVAL},
+
+    /* Configure EMC I/O mask (DQM0..DQM3) */
+    {2, 28, LPC178X_GPIO_EMC_REGVAL},
+    {2, 29, LPC178X_GPIO_EMC_REGVAL},
+    {2, 30, LPC178X_GPIO_EMC_REGVAL},
+    {2, 31, LPC178X_GPIO_EMC_REGVAL},
+  };
+  public:
+    Memory(/* args */);
+    ~Memory();
+    void Init(unsigned int (*delay)(uint32_t time));
+    void IO_config();
+};
 
 #endif
