@@ -1,16 +1,34 @@
 #include "lpc_types.h"
 #include "tx_api.h"
 #include "gx_api.h"
-#include "gx_display.h"
+
 #include "chip.h"
 #include "chip_lpc177x_8x.h"
 #include "iocon_17xx_40xx.h"
 #include "lcd_17xx_40xx.h"
 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
+
+#ifdef __cplusplus
+
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
+
+#endif
+
+#include "gx_display.h"
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
+#ifdef __cplusplus
+}
+#endif
+
 #include "display.h"
 
 
 uint16_t display_fb[272][480] __attribute__((section(".sram")));
+static void display_driver_toggle(struct GX_CANVAS_STRUCT *canvas, GX_RECTANGLE *dirty_area);
 
 Display::Display(/* args */)
 {
@@ -70,7 +88,6 @@ static void display_driver_toggle(struct GX_CANVAS_STRUCT *canvas, GX_RECTANGLE 
 {
   memset(display_fb, (int)canvas->gx_canvas_memory, sizeof(display_fb));
 }
-
 
 UINT display_driver_setup(GX_DISPLAY *display)
 {

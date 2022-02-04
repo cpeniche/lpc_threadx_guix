@@ -48,6 +48,7 @@ void tx_application_define(void *first_unused_memory)
                    30, 30, 1, TX_AUTO_START);             
 }
 
+
 void main_thread_entry(ULONG arg)
 {
 
@@ -60,12 +61,11 @@ void main_thread_entry(ULONG arg)
 
   gx_studio_display_configure(DISPLAY_1, display_driver_setup, LANGUAGE_ENGLISH, DISPLAY_1_THEME_1,&root);
 
-  gx_studio_named_widget_create("window",(GX_WIDGET*)root,GX_NULL);
+  gx_studio_named_widget_create((char *)"window",(GX_WIDGET*)root,GX_NULL);
 
   gx_widget_show(root);
 
-  gx_system_start();
- 
+  gx_system_start(); 
 }
 
 
