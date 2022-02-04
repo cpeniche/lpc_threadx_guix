@@ -1,10 +1,14 @@
 #include "lpc_types.h"
 #include "tx_api.h"
+#include "gx_api.h"
+#include "gx_display.h"
 #include "chip.h"
 #include "chip_lpc177x_8x.h"
 #include "iocon_17xx_40xx.h"
 #include "lcd_17xx_40xx.h"
+
 #include "display.h"
+
 
 uint16_t display_fb[272][480] __attribute__((section(".sram")));
 
@@ -60,11 +64,19 @@ void Display::Init()
   /* Enable lcd controller */
   LPC_LCD->CTRL |= CLCDC_LCDCTRL_ENABLE;
 
-  for(j=0;j<272;j++) 
-    for(i=0;i<480;i++)
-      display_fb[j][i]=RGB565(0x1F,0x0,0x0);;
-  
-  
-
 }
 
+static void display_driver_toggle(struct GX_CANVAS_STRUCT *canvas, GX_RECTANGLE *dirty_area)
+{
+  memset(display_fb, (int)canvas->gx_canvas_memory, sizeof(display_fb));
+}
+
+
+UINT display_driver_setup(GX_DISPLAY *display)
+{
+  memset(display_fb,0x0,sizeof(display_fb));
+
+  _gx_display_driver_565rgb_setup(display,GX_NULL,display_driver_toggle);
+
+  return GX_SUCCESS;
+}

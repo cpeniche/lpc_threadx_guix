@@ -1,7 +1,11 @@
 #ifndef __DISPLAY_H_
 #define __DISPLAY_H_
 
-#define RGB565(r,g,b) ((r<<11) | ((g&0x2F)<<5) | (b&0x1F))
+#define RGB565(r,g,b) ((b<<11) | ((g&0x2F)<<5) | (r&0x1F))
+#define DISPLAY_WIDTH 480
+#define DISPLAY_HEIGHT 272
+
+extern UINT display_driver_setup(GX_DISPLAY *display);
 
 class Display
 {
@@ -39,11 +43,11 @@ class Display
         .HBP = 2,                            /*!< Horizontal back porch in clocks */
         .HFP = 2,                            /*!< Horizontal front porch in clocks */
         .HSW = 41,                            /*!< HSYNC pulse width in clocks */
-        .PPL = 480,                           /*!< Pixels per line */
+        .PPL = DISPLAY_WIDTH,                /*!< Pixels per line */
         .VBP = 2,                            /*!< Vertical back porch in lines */
         .VFP = 2,                            /*!< Vertical front porch in lines */
-        .VSW = 10,                             /*!< VSYNC pulse width in lines */
-        .LPP = 272,                           /*!< Lines per panel */
+        .VSW = 10,                           /*!< VSYNC pulse width in lines */
+        .LPP = DISPLAY_HEIGHT,               /*!< Lines per panel */
         .IOE = 0,                             /*!< Invert output enable, 1 = invert */
         .IPC = 1,                             /*!< Invert panel clock, 1 = invert */
         .IHS = 1,                             /*!< Invert HSYNC, 1 = invert */

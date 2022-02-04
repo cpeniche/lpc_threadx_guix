@@ -4,7 +4,7 @@ TOOL := gnu
 
 INCLUDES = -Iapplication/inc
 INCLUDES += -Ilib/Azure/threadx/common/inc -Ilib/Azure/threadx/ports/$(ARCH)/$(TOOL)/inc
-INCLUDES += -Ilib/Azure/guix/ports/$(ARCH)/$(TOOL)/inc
+INCLUDES += -Ilib/Azure/guix/ports/$(ARCH)/$(TOOL)/inc -Ilib/Azure/guix/common/inc
 INCLUDES += -Ilib/$(LPC_DIR)/inc
 
 obj-y = src/
