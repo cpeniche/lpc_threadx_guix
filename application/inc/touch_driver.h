@@ -12,10 +12,9 @@ class Touch_Screen
         };
         uint8_t tx_buff[20];
         uint8_t rx_buff[20];
-
-    void Init();
-    void IO_config();
-    
+    public:
+        void Init();
+        void IO_config();
 };
 
 #endif

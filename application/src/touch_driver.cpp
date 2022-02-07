@@ -25,7 +25,7 @@ void Touch_Screen::IO_config()
 void Touch_Screen::Init()
 {
 
-/* Enable Peripheral */
+/* Enable Peripheral Clock*/
     Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_SSP0);
 
 /* Set clock div to zero and prescaler to 27 for a 2 MHZ clock */
@@ -36,5 +36,8 @@ void Touch_Screen::Init()
     
 /* Set sspx clock polarity, bits per frame and format*/
     Chip_SSP_SetFormat(SSPx, SSP_BITS_8, SSP_FRAMEFORMAT_SPI, SSP_CLOCK_CPHA0_CPOL0);     
+
+/* Enable Peripheral */
+    Chip_SSP_Enable(SSPx);
     
 }

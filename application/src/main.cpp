@@ -4,10 +4,13 @@
 #include "gx_api.h"
 #include "gx_display.h"
 #include "display.h"
+#include "touch_driver.h"
 
 /* add GUIX generated files*/
 #include "3dprint_lcd_resources.h"
 #include "3dprint_lcd_specifications.h"
+
+
 
 #define DEMO_STACK_SIZE (2 * 1024)
 void main_thread_entry(ULONG arg);
@@ -21,6 +24,7 @@ CHAR main_thread_name[] = "main thread";
 const uint32_t OscRateIn = 12000000;
 Memory Sram;
 Display TFT_lcd;
+Touch_Screen Tdrv;
 
 GX_WINDOW_ROOT *root;
 
@@ -31,6 +35,7 @@ int main()
 
   Sram.IO_config();
   TFT_lcd.IO_Config();  
+  Tdrv.IO_config();
   /* Enter the ThreadX kernel. */
   tx_kernel_enter();
 }
@@ -58,6 +63,7 @@ void main_thread_entry(ULONG arg)
 
   Sram.Init(tx_thread_sleep);
   TFT_lcd.Init();
+  Tdrv.IO_config();
 
 /* Initialize the GUIX library */
   gx_system_initialize();
