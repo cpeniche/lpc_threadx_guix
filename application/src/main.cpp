@@ -34,7 +34,7 @@ int main()
   Chip_SystemInit();
 
   Sram.IO_config();
-  TFT_lcd.IO_Config();  
+  TFT_lcd.IO_config();  
   Tdrv.IO_config();
   /* Enter the ThreadX kernel. */
   tx_kernel_enter();

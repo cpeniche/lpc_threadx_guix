@@ -62,7 +62,7 @@ class Display
         
         Display(/* args */);
         ~Display();
-        void IO_Config();
+        void IO_config();
         void Init();
 };
 

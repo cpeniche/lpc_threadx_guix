@@ -38,25 +38,19 @@ Display::~Display()
 {
 }
 
-void Display::IO_Config()
+void Display::IO_config()
 {
-  int i, y;
-  ULONG base = LPC_IOCON_BASE;
-  uint32_t test = 0;
-  LPC_IOCON_T pinmux; /* Hold the address of each IO_CON registers */
-
-  /* fill up all the IOCON addresses on the pinmux struct*/
-  for (i = 0; i < 5; i++)
+  uint32_t index = 0, port = 0, base_addr;
+  LPC_IOCON_T base = {0};
+  
+  /* Configure pins as table pin[] */
+  for (index = 0; index < (sizeof(pin) / sizeof(PINMUX_GRP_T)); index++)
   {
-    for (y = 0; y < 32; y++)
-    {
-      pinmux.p[i][y] = base + (y * 4);
-    }
-    base = pinmux.p[i][y - 1] + 4;
+    base.p[pin[index].pingrp][pin[index].pinnum] = (LPC_IOCON_BASE + (pin[index].pingrp) * 0x80 + (pin[index].pinnum) * 4);
   }
 
   /* configure lcd I/O pins*/
-  Chip_IOCON_SetPinMuxing(&pinmux, pin, sizeof(pin) / sizeof(PINMUX_GRP_T));
+  Chip_IOCON_SetPinMuxing(&base, pin, sizeof(pin) / sizeof(PINMUX_GRP_T));
 
 }
 
@@ -76,6 +70,7 @@ void Display::Init()
   /* Enable LCD Power */
   LPC_LCD->CTRL |= CLCDC_LCDCTRL_PWR;
 
+  /* Enable led backlight */
   LPC_GPIO2->DIR |= 0x2;
 	LPC_GPIO2->SET |= 0x2;
 
@@ -87,13 +82,16 @@ void Display::Init()
 static void display_driver_toggle(struct GX_CANVAS_STRUCT *canvas, GX_RECTANGLE *dirty_area)
 {
   
+  /* Copy GUIX local canvas buffer to the lcd buffer*/
   memcpy(display_fb,canvas->gx_canvas_memory,sizeof(display_fb));
 }
 
 UINT display_driver_setup(GX_DISPLAY *display)
 {
+  /* Initialize screen to black */
   memset(display_fb,0xFFFF,sizeof(display_fb));
 
+  /* Initialize driver to use 565 rgb pixel maps*/
   _gx_display_driver_565rgb_setup(display,GX_NULL,display_driver_toggle);
 
   return GX_SUCCESS;

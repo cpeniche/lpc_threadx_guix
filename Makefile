@@ -86,4 +86,8 @@ clean:
 	@rm -f *.map *.elf
 	@find -name '*.[aod]' -type f -print | xargs rm -f
 
+clean_app:
+	@rm -f *.map *.elf
+	@find ./application -name '*.[aod]' -type f -print  | xargs rm -f
+
 .phony = $(PHONY)
