@@ -166,7 +166,7 @@ SECTIONS
 		*(COMMON)
 		. = ALIGN(4);
 		__bss_end__ = .;
-	} > SD_RAM
+	} > RAM
 
 	.heap (COPY):
 	{

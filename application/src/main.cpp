@@ -4,8 +4,10 @@
 #include "gx_api.h"
 #include "gx_display.h"
 #include "display.h"
-#include "sample_resources.h"
-#include "sample_specifications.h"
+
+/* add GUIX generated files*/
+#include "3dprint_lcd_resources.h"
+#include "3dprint_lcd_specifications.h"
 
 #define DEMO_STACK_SIZE (2 * 1024)
 void main_thread_entry(ULONG arg);
@@ -57,15 +59,24 @@ void main_thread_entry(ULONG arg)
   Sram.Init(tx_thread_sleep);
   TFT_lcd.Init();
 
+/* Initialize the GUIX library */
   gx_system_initialize();
 
-  gx_studio_display_configure(DISPLAY_1, display_driver_setup, LANGUAGE_ENGLISH, DISPLAY_1_THEME_1,&root);
+  /* Configure the main display. */
+  gx_studio_display_configure(DISPLAY,                      /* Display to configure*/
+                              display_driver_setup, /* Driver to use */
+                              LANGUAGE_ENGLISH,                  /* Language to install */
+                              DISPLAY_THEME_1,        /* Theme to install */
+                              &root);                     /* Root window pointer */
 
-  gx_studio_named_widget_create((char *)"window",(GX_WIDGET*)root,GX_NULL);
+  /* Create the screen - attached to root window. */
+  gx_studio_named_widget_create((char *)"main_window", (GX_WIDGET *)root, GX_NULL);
 
+  /* Show the root window to make it visible. */
   gx_widget_show(root);
 
-  gx_system_start(); 
+  /* Let GUIX run. */
+  gx_system_start();
 }
 
 

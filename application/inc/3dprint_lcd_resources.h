@@ -5,48 +5,56 @@
 /*  resource file(s). For more information please refer to the Azure RTOS GUIX */
 /*  Studio User Guide, or visit our web site at azure.com/rtos                 */
 /*                                                                             */
-/*  GUIX Studio Revision 6.1.9.2                                               */
-/*  Date (dd.mm.yyyy):  3. 2.2022   Time (hh:mm): 21:07                        */
+/*  GUIX Studio Revision 6.1.10.0                                              */
+/*  Date (dd.mm.yyyy):  5. 2.2022   Time (hh:mm): 22:53                        */
 /*******************************************************************************/
 
 
-#ifndef _SAMPLE_DISPLAY_1_RESOURCES_H_
-#define _SAMPLE_DISPLAY_1_RESOURCES_H_
+#ifndef _3DPRINT_LCD_DISPLAY_RESOURCES_H_
+#define _3DPRINT_LCD_DISPLAY_RESOURCES_H_
 
 #include "gx_api.h"
 
 /* Display and theme definitions                                               */
 
-#define DISPLAY_1 0
-#define DISPLAY_1_COLOR_FORMAT GX_COLOR_FORMAT_24XRGB
-#define DISPLAY_1_X_RESOLUTION 480
-#define DISPLAY_1_Y_RESOLUTION 272
-#define DISPLAY_1_THEME_1 0
-#define DISPLAY_1_THEME_TABLE_SIZE 1
+#define DISPLAY 0
+#define DISPLAY_COLOR_FORMAT GX_COLOR_FORMAT_565BGR
+#define DISPLAY_X_RESOLUTION 480
+#define DISPLAY_Y_RESOLUTION 272
+#define DISPLAY_THEME_1 0
+#define DISPLAY_THEME_TABLE_SIZE 1
 
 /* Language definitions                                                        */
 
 #define LANGUAGE_ENGLISH 0
-#define DISPLAY_1_LANGUAGE_TABLE_SIZE 1
+#define DISPLAY_LANGUAGE_TABLE_SIZE 1
 
 /* Color ID definitions                                                        */
 
-#define DISPLAY_1_COLOR_TABLE_SIZE 29
+#define DISPLAY_COLOR_TABLE_SIZE 29
 
 /* Font ID definitions                                                         */
 
-#define DISPLAY_1_FONT_TABLE_SIZE 4
+#define DISPLAY_FONT_TABLE_SIZE 4
 
 /* Pixelmap ID definitions                                                     */
 
-#define GX_PIXELMAP_ID_USB_80_80 5
-#define GX_PIXELMAP_ID_USB_80_80_DIS 6
-#define GX_PIXELMAP_ID_USB_80_80_SEL 7
-#define DISPLAY_1_PIXELMAP_TABLE_SIZE 8
+#define GX_PIXELMAP_ID_ADJUST_ICON_80X80 5
+#define GX_PIXELMAP_ID_BED_LEVEL_ICON_80X80 6
+#define GX_PIXELMAP_ID_DONE_ICON_80X80 7
+#define GX_PIXELMAP_ID_HEATED_PLATE_ICON 8
+#define GX_PIXELMAP_ID_INFO_ICON_80X80 9
+#define GX_PIXELMAP_ID_NOZZLE_TEMPERATURE_ICON_48X48 10
+#define GX_PIXELMAP_ID_SETTINGS_80X80 11
+#define DISPLAY_PIXELMAP_TABLE_SIZE 12
 
 /* String Ids                                                                  */
 
 #define GX_STRING_ID_STRING_1 1
-#define DISPLAY_1_STRING_TABLE_SIZE 2
+#define GX_STRING_ID_STRING_2 2
+#define GX_STRING_ID_STRING_3 3
+#define GX_STRING_ID_STRING_4 4
+#define GX_STRING_ID_STRING_5 5
+#define DISPLAY_STRING_TABLE_SIZE 6
 
 #endif                                       /* sentry                         */

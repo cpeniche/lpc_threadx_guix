@@ -86,12 +86,13 @@ void Display::Init()
 
 static void display_driver_toggle(struct GX_CANVAS_STRUCT *canvas, GX_RECTANGLE *dirty_area)
 {
-  memset(display_fb, (int)canvas->gx_canvas_memory, sizeof(display_fb));
+  
+  memcpy(display_fb,canvas->gx_canvas_memory,sizeof(display_fb));
 }
 
 UINT display_driver_setup(GX_DISPLAY *display)
 {
-  memset(display_fb,0x0,sizeof(display_fb));
+  memset(display_fb,0xFFFF,sizeof(display_fb));
 
   _gx_display_driver_565rgb_setup(display,GX_NULL,display_driver_toggle);
 

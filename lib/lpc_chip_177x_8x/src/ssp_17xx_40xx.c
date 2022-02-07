@@ -106,7 +106,10 @@ STATIC CHIP_SYSCTL_CLOCK_T Chip_SSP_GetClockIndex(LPC_SSP_T *pSSP)
 {
 	CHIP_SYSCTL_CLOCK_T clkSSP;
 
-	if (pSSP == LPC_SSP1) {
+	if (pSSP == LPC_SSP0) {
+		clkSSP = SYSCTL_CLOCK_SSP0;
+	}
+	else if (pSSP == LPC_SSP1) {
 		clkSSP = SYSCTL_CLOCK_SSP1;
 	}
 #if defined(CHIP_LPC177X_8X) || defined(CHIP_LPC40XX)

@@ -5,13 +5,13 @@
 /*  specification file(s). For more information please refer to the Azure RTOS */
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
-/*  GUIX Studio Revision 6.1.9.2                                               */
-/*  Date (dd.mm.yyyy):  3. 2.2022   Time (hh:mm): 21:07                        */
+/*  GUIX Studio Revision 6.1.10.0                                              */
+/*  Date (dd.mm.yyyy):  5. 2.2022   Time (hh:mm): 22:53                        */
 /*******************************************************************************/
 
 
-#ifndef _SAMPLE_SPECIFICATIONS_H_
-#define _SAMPLE_SPECIFICATIONS_H_
+#ifndef _3DPRINT_LCD_SPECIFICATIONS_H_
+#define _3DPRINT_LCD_SPECIFICATIONS_H_
 
 #include "gx_api.h"
 
@@ -22,8 +22,10 @@ extern   "C" {
 
 /* Define widget ids                                                           */
 
-#define WND_BG 1
-#define USB_ICON 2
+#define done_btn_id 1
+#define nozzle_id 2
+#define bed_id 3
+#define info_btn_id 4
 
 
 /* Define animation ids                                                        */
@@ -35,6 +37,32 @@ extern   "C" {
 
 #define GX_NEXT_USER_EVENT_ID GX_FIRST_USER_EVENT
 
+#define GX_ACTION_FLAG_DYNAMIC_TARGET 0x01
+#define GX_ACTION_FLAG_DYNAMIC_PARENT 0x02
+#define GX_ACTION_FLAG_POP_TARGET     0x04
+#define GX_ACTION_FLAG_POP_PARENT     0x08
+
+typedef struct GX_STUDIO_ACTION_STRUCT
+{
+    GX_UBYTE opcode;
+    GX_UBYTE flags;
+    GX_CONST VOID *parent;
+    GX_CONST VOID *target;
+    GX_CONST GX_ANIMATION_INFO  *animation;
+} GX_STUDIO_ACTION;
+
+typedef struct GX_STUDIO_EVENT_ENTRY_STRUCT
+{
+    ULONG event_type;
+    USHORT event_sender;
+    GX_CONST GX_STUDIO_ACTION *action_list;
+} GX_STUDIO_EVENT_ENTRY;
+
+typedef struct GX_STUDIO_EVENT_PROCESS_STRUCT 
+{
+    GX_CONST GX_STUDIO_EVENT_ENTRY *event_table;
+    UINT (*chain_event_handler)(GX_WIDGET *, GX_EVENT *);
+} GX_STUDIO_EVENT_PROCESS;
 
 /* Declare properties structures for each utilized widget type                 */
 
@@ -77,23 +105,56 @@ typedef struct
 
 typedef struct
 {
+    GX_RESOURCE_ID normal_pixelmap_id;
+    GX_RESOURCE_ID selected_pixelmap_id;
+} GX_ICON_PROPERTIES;
+
+typedef struct
+{
     GX_RESOURCE_ID wallpaper_id;
 } GX_WINDOW_PROPERTIES;
+
+typedef struct
+{
+    GX_RESOURCE_ID string_id;
+    GX_RESOURCE_ID font_id;
+    GX_RESOURCE_ID normal_text_color_id;
+    GX_RESOURCE_ID selected_text_color_id;
+    GX_RESOURCE_ID disabled_text_color_id;
+    GX_RESOURCE_ID readonly_fill_color_id;
+    GX_RESOURCE_ID readonly_text_color_id;
+    GX_CHAR *buffer;
+    UINT buffer_size;
+} GX_SINGLE_LINE_TEXT_INPUT_PROPERTIES;
 
 
 /* Declare top-level control blocks                                            */
 
-typedef struct BCKWRD_WINDOW_CONTROL_BLOCK_STRUCT
+typedef struct INFO_WINDOW_CONTROL_BLOCK_STRUCT
 {
     GX_WINDOW_MEMBERS_DECLARE
-    GX_PIXELMAP_BUTTON bckwrd_window_pixelmap_button;
-} BCKWRD_WINDOW_CONTROL_BLOCK;
+    GX_PIXELMAP_BUTTON info_window_done_btn;
+} INFO_WINDOW_CONTROL_BLOCK;
+
+typedef struct MAIN_WINDOW_CONTROL_BLOCK_STRUCT
+{
+    GX_WINDOW_MEMBERS_DECLARE
+    GX_ICON main_window_nozzle;
+    GX_SINGLE_LINE_TEXT_INPUT main_window_nozzle_temp;
+    GX_ICON main_window_bed;
+    GX_SINGLE_LINE_TEXT_INPUT main_window_bed_temp;
+    GX_PIXELMAP_BUTTON main_window_seetings_btn;
+    GX_PIXELMAP_BUTTON main_window_bed_leveling_btn;
+    GX_PIXELMAP_BUTTON main_window_adjust_btn;
+    GX_PIXELMAP_BUTTON main_window_info_btn;
+} MAIN_WINDOW_CONTROL_BLOCK;
 
 
 /* extern statically defined control blocks                                    */
 
 #ifndef GUIX_STUDIO_GENERATED_FILE
-extern BCKWRD_WINDOW_CONTROL_BLOCK bckwrd_window;
+extern INFO_WINDOW_CONTROL_BLOCK info_window;
+extern MAIN_WINDOW_CONTROL_BLOCK main_window;
 #endif
 
 /* Declare event process functions, draw functions, and callback functions     */
@@ -125,10 +186,13 @@ typedef struct GX_STUDIO_DISPLAY_INFO_STRUCT
 /* Declare Studio-generated functions for creating top-level widgets           */
 
 UINT gx_studio_pixelmap_button_create(GX_CONST GX_STUDIO_WIDGET *info, GX_WIDGET *control_block, GX_WIDGET *parent);
+UINT gx_studio_icon_create(GX_CONST GX_STUDIO_WIDGET *info, GX_WIDGET *control_block, GX_WIDGET *parent);
 UINT gx_studio_window_create(GX_CONST GX_STUDIO_WIDGET *info, GX_WIDGET *control_block, GX_WIDGET *parent);
+UINT gx_studio_text_input_create(GX_CONST GX_STUDIO_WIDGET *info, GX_WIDGET *control_block, GX_WIDGET *parent);
 GX_WIDGET *gx_studio_widget_create(GX_BYTE *storage, GX_CONST GX_STUDIO_WIDGET *definition, GX_WIDGET *parent);
 UINT gx_studio_named_widget_create(char *name, GX_WIDGET *parent, GX_WIDGET **new_widget);
 UINT gx_studio_display_configure(USHORT display, UINT (*driver)(GX_DISPLAY *), GX_UBYTE language, USHORT theme, GX_WINDOW_ROOT **return_root);
+UINT gx_studio_auto_event_handler(GX_WIDGET *widget, GX_EVENT *event_ptr, GX_CONST GX_STUDIO_EVENT_PROCESS *record);
 
 /* Determine if a C++ compiler is being used.  If so, complete the standard
   C conditional started above.                                                 */
