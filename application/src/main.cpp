@@ -5,19 +5,45 @@
 #include "gx_display.h"
 #include "display.h"
 #include "touch_driver.h"
+#include "main.h"
 
 /* add GUIX generated files*/
 #include "3dprint_lcd_resources.h"
 #include "3dprint_lcd_specifications.h"
 
 
+#define STACK_SIZE (2 * 1024)
+CHAR main_stack[STACK_SIZE];
+CHAR gui_stack[STACK_SIZE];
 
-#define DEMO_STACK_SIZE (2 * 1024)
-void main_thread_entry(ULONG arg);
+
+static void main_thread_entry(ULONG arg);
+static void gui_thread_entry(ULONG args);
 
 /* Define global data structures.   */
-
 TX_THREAD main_thread;
+TX_THREAD gui_thread;
+TX_THREAD touch_drv_thread;
+
+APP_THREAD_INFO thread_list[]={
+  {
+   .thread = &main_thread,
+   .name = (char *)"main thread",
+   .entry_func = main_thread_entry,
+   .stack_ptr = main_stack,
+   .stack_size = STACK_SIZE,
+   .start_type = TX_AUTO_START
+   },
+   {
+   .thread = &gui_thread,
+   .name = (char *)"gui thread",
+   .entry_func = gui_thread_entry,
+   .stack_ptr = gui_stack,
+   .stack_size = STACK_SIZE,
+   .start_type = TX_DONT_START
+   }
+};
+
 ULONG class_driver_index;
 UINT status;
 CHAR main_thread_name[] = "main thread";
@@ -32,10 +58,10 @@ int main()
 {
 
   Chip_SystemInit();
-
   Sram.IO_config();
   TFT_lcd.IO_config();  
   Tdrv.IO_config();
+
   /* Enter the ThreadX kernel. */
   tx_kernel_enter();
 }
@@ -45,27 +71,36 @@ void tx_application_define(void *first_unused_memory)
   CHAR *stack_pointer;
   CHAR *memory_pointer;
 
-  /* Initialize the free memory pointer */
-  stack_pointer = (CHAR *)first_unused_memory;
-  memory_pointer = stack_pointer + DEMO_STACK_SIZE;
-
   /* Create the main demo thread.  */
-  tx_thread_create(&main_thread, main_thread_name, main_thread_entry, 0,
-                   stack_pointer, DEMO_STACK_SIZE,
-                   30, 30, 1, TX_AUTO_START);             
+  THREAD_CREATE(MAIN_THREAD);
+
+  /* Create thread for gui */
+  THREAD_CREATE(GUI_THREAD);
+
 }
 
 
-void main_thread_entry(ULONG arg)
+static void main_thread_entry(ULONG arg)
 {
 
   UINT i = 0;
 
   Sram.Init(tx_thread_sleep);
   TFT_lcd.Init();
-  Tdrv.IO_config();
+  Tdrv.Init();
+  tx_thread_resume(thread_list[GUI_THREAD].thread);
+  
+  while(true)
+  {
+    Tdrv.get_pos(X_POS);
+    Tdrv.get_pos(Y_POS);  
+  }
+}
 
-/* Initialize the GUIX library */
+
+static void gui_thread_entry(ULONG args)
+{
+  /* Initialize the GUIX library */
   gx_system_initialize();
 
   /* Configure the main display. */
@@ -84,5 +119,3 @@ void main_thread_entry(ULONG arg)
   /* Let GUIX run. */
   gx_system_start();
 }
-
-

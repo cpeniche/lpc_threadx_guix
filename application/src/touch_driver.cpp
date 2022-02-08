@@ -1,5 +1,6 @@
 #include "lpc_types.h"
 #include "chip.h"
+#include "tx_api.h"
 #include "chip_lpc177x_8x.h"
 #include "touch_driver.h"
 #include "ssp_17xx_40xx.h"
@@ -40,4 +41,24 @@ void Touch_Screen::Init()
 /* Enable Peripheral */
     Chip_SSP_Enable(SSPx);
     
+}
+
+void Touch_Screen::get_pos(char coordinate)
+{
+    uint16_t *pos;
+
+    if (coordinate == X_POS)
+    {
+        tx_buff=0xD3;
+        pos = &x_pos;
+    }        
+    else
+    {
+        tx_buff=0x93;
+        pos = &y_pos;
+    }
+    Chip_SSP_WriteFrames_Blocking(SSPx,&tx_buff,1);
+    tx_thread_sleep(1);
+    Chip_SSP_ReadFrames_Blocking(SSPx,&rx_buff[0],2);
+    *pos = (*((uint16_t *)rx_buff) >> 4)  & 0x0FF;
 }
