@@ -1,6 +1,10 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct STRUCT_THREAD_INFO
 {
     TX_THREAD *thread;
@@ -21,8 +25,6 @@ enum{
 extern APP_THREAD_INFO thread_list[];
 extern Touch_Screen Tdrv;
 
-extern TX_SEMAPHORE touch_semaphore;
-
 #define THREAD_CREATE(id) tx_thread_create(thread_list[id].thread,           /* thread ptr */     \
                                             thread_list[id].name,            /* name   */         \
                                             thread_list[id].entry_func,      /* entry function */ \
@@ -35,5 +37,9 @@ extern TX_SEMAPHORE touch_semaphore;
                                             thread_list[id].start_type);     /* auto start */
 
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif
+
