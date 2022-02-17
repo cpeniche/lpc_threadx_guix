@@ -64,6 +64,8 @@ extern void  _start(void) __attribute__((noreturn));    /* PreeMain (C library e
 extern int  __START(void) __attribute__((noreturn));    /* main entry point */
 #endif
 
+extern void GPIO_IRQHandler();
+
 #ifndef __NO_SYSTEM_INIT
 extern void SystemInit (void);            /* CMSIS System Initialization      */
 #endif
@@ -130,6 +132,7 @@ void I2C_IRQHandler      (void) __attribute__ ((weak, alias("Default_Handler")))
 void CPU_CLCD_IRQHandler (void) __attribute__ ((weak, alias("Default_Handler")));
 void UART3_IRQHandler    (void) __attribute__ ((weak, alias("Default_Handler")));
 void SPI_IRQHandler      (void) __attribute__ ((weak, alias("Default_Handler")));
+//void GPIO_IRQHandler     (void) __attribute__ ((weak, alias("Default_Handler")));
 
 
 /*----------------------------------------------------------------------------
@@ -186,7 +189,16 @@ const pFunc __Vectors[] __attribute__ ((section(".vectors"))) = {
   CPU_CLCD_IRQHandler,                      /* 28: Reserved - CPU FPGA CLCD   */
   0,                                        /* 29: Reserved - CPU FPGA        */
   UART3_IRQHandler,                         /* 30: UART3    - CPU FPGA        */
-  SPI_IRQHandler                            /* 31: SPI Touchscreen - CPU FPGA */
+  SPI_IRQHandler,                           /* 31: SPI Touchscreen - CPU FPGA */
+  0,                                        /* 32: Reserved                   */
+  0,                                        /* 33: Reserved                   */
+  0,                                        /* 34: Reserved                   */
+  0,                                        /* 35: Reserved                   */
+  0,                                        /* 36: Reserved                   */
+  0,                                        /* 37: Reserved                   */
+  GPIO_IRQHandler,                          /* 38: Reserved                   */
+  0,                                        /* 39: Reserved                   */
+  0                                         /* 40: Reserved                   */
 };
 
 

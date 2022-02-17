@@ -19,6 +19,9 @@ enum{
 };
 
 extern APP_THREAD_INFO thread_list[];
+extern Touch_Screen Tdrv;
+
+extern TX_SEMAPHORE touch_semaphore;
 
 #define THREAD_CREATE(id) tx_thread_create(thread_list[id].thread,           /* thread ptr */     \
                                             thread_list[id].name,            /* name   */         \

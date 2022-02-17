@@ -14,16 +14,22 @@
 
 #define STACK_SIZE (2 * 1024)
 CHAR main_stack[STACK_SIZE];
-CHAR gui_stack[STACK_SIZE];
+CHAR gui_stack[STACK_SIZE]    __attribute__((section(".sram")));
+CHAR touch_stack[STACK_SIZE]  __attribute__((section(".sram")));
+
 
 
 static void main_thread_entry(ULONG arg);
 static void gui_thread_entry(ULONG args);
+static void touch_thread_entry(ULONG args);
 
 /* Define global data structures.   */
 TX_THREAD main_thread;
 TX_THREAD gui_thread;
-TX_THREAD touch_drv_thread;
+TX_THREAD touch_thread;
+
+/* semaphore definitions */
+TX_SEMAPHORE touch_semaphore;
 
 APP_THREAD_INFO thread_list[]={
   {
@@ -39,6 +45,14 @@ APP_THREAD_INFO thread_list[]={
    .name = (char *)"gui thread",
    .entry_func = gui_thread_entry,
    .stack_ptr = gui_stack,
+   .stack_size = STACK_SIZE,
+   .start_type = TX_DONT_START
+   },
+   {
+   .thread = &touch_thread,
+   .name = (char *)"thouch thread",
+   .entry_func = touch_thread_entry,
+   .stack_ptr = touch_stack,
    .stack_size = STACK_SIZE,
    .start_type = TX_DONT_START
    }
@@ -73,10 +87,6 @@ void tx_application_define(void *first_unused_memory)
 
   /* Create the main demo thread.  */
   THREAD_CREATE(MAIN_THREAD);
-
-  /* Create thread for gui */
-  THREAD_CREATE(GUI_THREAD);
-
 }
 
 
@@ -88,12 +98,18 @@ static void main_thread_entry(ULONG arg)
   Sram.Init(tx_thread_sleep);
   TFT_lcd.Init();
   Tdrv.Init();
+  /* Create thread for gui */
+  THREAD_CREATE(GUI_THREAD);
+
+  /* Create touch screen thread */
+  THREAD_CREATE(TOUCH_THREAD);
+
   tx_thread_resume(thread_list[GUI_THREAD].thread);
+  tx_thread_resume(thread_list[TOUCH_THREAD].thread);
   
   while(true)
   {
-    Tdrv.get_pos(X_POS);
-    Tdrv.get_pos(Y_POS);  
+    tx_thread_relinquish();
   }
 }
 
@@ -118,4 +134,53 @@ static void gui_thread_entry(ULONG args)
 
   /* Let GUIX run. */
   gx_system_start();
+}
+
+static void touch_thread_entry(ULONG args)
+{
+  UINT status;
+  uint8_t filter_samples=0;
+  float filter_data[2], filter_data_1[2]={0};
+  static float alpha=0.3, pressure;
+  uint16_t rx_plate=805;
+  //305
+
+  //tx_semaphore_create(&touch_semaphore,(char *)"touch_semaphore",0);
+
+  while(true)
+  {
+    
+    Tdrv.power_down();
+
+    Tdrv.int_flag=0;
+
+    while(Tdrv.int_flag==0);
+    
+    /* take n samples of x position*/
+    do 
+    { 
+      /* Read x and y position */
+      Tdrv.get_pos(X_POS,0);
+      Tdrv.get_pos(Y_POS,0);
+
+      /* apply low pass filter to x position*/
+      filter_data[X_POS] = alpha*filter_data_1[X_POS] + (1-alpha)*Tdrv.pos[X_POS][0];
+      filter_data_1[X_POS] = filter_data[X_POS];
+
+      /* apply low pass filter to y position*/
+      filter_data[Y_POS] = alpha*filter_data_1[Y_POS] + (1-alpha)*Tdrv.pos[Y_POS][0];
+      filter_data_1[Y_POS] = filter_data[Y_POS];
+
+      /* Increment sample counts*/
+      filter_samples++;
+    }while (filter_samples < 5);
+    
+    filter_samples=0;
+    
+    /* Calculate pressure */
+    //pressure = rx_plate*(filter_data/4096)*((Tdrv.pos[Z2_POS][0]/Tdrv.pos[Z1_POS][0])-1);
+    
+  }
+
+
 }

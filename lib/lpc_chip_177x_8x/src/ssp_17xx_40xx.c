@@ -297,7 +297,7 @@ uint32_t Chip_SSP_ReadFrames_Blocking(LPC_SSP_T *pSSP, uint8_t *buffer, uint32_t
 		while (tx_cnt < buffer_len || rx_cnt < buffer_len) {
 			/* write data to buffer */
 			if ((Chip_SSP_GetStatus(pSSP, SSP_STAT_TNF) == SET) && (tx_cnt < buffer_len)) {
-				Chip_SSP_SendFrame(pSSP, 0xFFFF);	/* just send dummy data */
+				Chip_SSP_SendFrame(pSSP, 0x0000);	/* just send dummy data */
 				tx_cnt += 2;
 			}
 
@@ -322,7 +322,7 @@ uint32_t Chip_SSP_ReadFrames_Blocking(LPC_SSP_T *pSSP, uint8_t *buffer, uint32_t
 		while (tx_cnt < buffer_len || rx_cnt < buffer_len) {
 			/* write data to buffer */
 			if ((Chip_SSP_GetStatus(pSSP, SSP_STAT_TNF) == SET) && (tx_cnt < buffer_len)) {
-				Chip_SSP_SendFrame(pSSP, 0xFF);	/* just send dummy data		 */
+				Chip_SSP_SendFrame(pSSP, 0x00);	/* just send dummy data		 */
 				tx_cnt++;
 			}
 
