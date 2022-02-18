@@ -6,12 +6,12 @@
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
 /*  GUIX Studio Revision 6.1.10.0                                              */
-/*  Date (dd.mm.yyyy):  5. 2.2022   Time (hh:mm): 22:53                        */
+/*  Date (dd.mm.yyyy): 17. 2.2022   Time (hh:mm): 22:27                        */
 /*******************************************************************************/
 
 
-#ifndef _3DPRINT_LCD_SPECIFICATIONS_H_
-#define _3DPRINT_LCD_SPECIFICATIONS_H_
+#ifndef __3DPRINT_LCD_SPECIFICATIONS_H_
+#define __3DPRINT_LCD_SPECIFICATIONS_H_
 
 #include "gx_api.h"
 
@@ -22,10 +22,15 @@ extern   "C" {
 
 /* Define widget ids                                                           */
 
-#define done_btn_id 1
-#define nozzle_id 2
-#define bed_id 3
-#define info_btn_id 4
+#define cal_window_id 1
+#define tl_icon_id 2
+#define tr_icon_id 3
+#define bl_icon_id 4
+#define br_icon_id 5
+#define done_btn_id 6
+#define nozzle_id 7
+#define bed_id 8
+#define info_btn_id 9
 
 
 /* Define animation ids                                                        */
@@ -35,7 +40,10 @@ extern   "C" {
 
 /* Define user event ids                                                       */
 
-#define GX_NEXT_USER_EVENT_ID GX_FIRST_USER_EVENT
+enum user_defined_events{
+    Ok_Button_Event = GX_FIRST_USER_EVENT,
+    GX_NEXT_USER_EVENT_ID
+};
 
 #define GX_ACTION_FLAG_DYNAMIC_TARGET 0x01
 #define GX_ACTION_FLAG_DYNAMIC_PARENT 0x02
@@ -130,6 +138,15 @@ typedef struct
 
 /* Declare top-level control blocks                                            */
 
+typedef struct CAL_WINDOW_CONTROL_BLOCK_STRUCT
+{
+    GX_WINDOW_MEMBERS_DECLARE
+    GX_ICON Cal_Window_tl_icon;
+    GX_ICON Cal_Window_tr_icon;
+    GX_ICON Cal_Window_bl_icon;
+    GX_ICON Cal_Window_br_icon;
+} CAL_WINDOW_CONTROL_BLOCK;
+
 typedef struct INFO_WINDOW_CONTROL_BLOCK_STRUCT
 {
     GX_WINDOW_MEMBERS_DECLARE
@@ -153,6 +170,7 @@ typedef struct MAIN_WINDOW_CONTROL_BLOCK_STRUCT
 /* extern statically defined control blocks                                    */
 
 #ifndef GUIX_STUDIO_GENERATED_FILE
+extern CAL_WINDOW_CONTROL_BLOCK Cal_Window;
 extern INFO_WINDOW_CONTROL_BLOCK info_window;
 extern MAIN_WINDOW_CONTROL_BLOCK main_window;
 #endif

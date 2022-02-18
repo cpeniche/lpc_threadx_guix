@@ -5,8 +5,6 @@
 #define DISPLAY_WIDTH 480
 #define DISPLAY_HEIGHT 272
 
-extern UINT display_driver_setup(GX_DISPLAY *display);
-
 class Display
 {
     private:
@@ -65,5 +63,17 @@ class Display
         void IO_config();
         void Init();
 };
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern UINT display_driver_setup(GX_DISPLAY *display);
+  
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

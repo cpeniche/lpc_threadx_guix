@@ -6,7 +6,7 @@
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
 /*  GUIX Studio Revision 6.1.10.0                                              */
-/*  Date (dd.mm.yyyy):  5. 2.2022   Time (hh:mm): 22:53                        */
+/*  Date (dd.mm.yyyy): 17. 2.2022   Time (hh:mm): 22:27                        */
 /*******************************************************************************/
 
 
@@ -16,6 +16,7 @@
 #include "3dprint_lcd_specifications.h"
 
 static GX_WIDGET *gx_studio_nested_widget_create(GX_BYTE *control, GX_CONST GX_STUDIO_WIDGET *definition, GX_WIDGET *parent);
+CAL_WINDOW_CONTROL_BLOCK Cal_Window;
 INFO_WINDOW_CONTROL_BLOCK info_window;
 MAIN_WINDOW_CONTROL_BLOCK main_window;
 GX_DISPLAY display_control_block;
@@ -408,6 +409,167 @@ UINT gx_studio_text_input_create(GX_CONST GX_STUDIO_WIDGET *info, GX_WIDGET *con
     }
     return status;
 }
+GX_WINDOW_PROPERTIES Cal_Window_properties =
+{
+    0                                        /* wallpaper pixelmap id          */
+};
+GX_ICON_PROPERTIES Cal_Window_tl_icon_properties =
+{
+    GX_PIXELMAP_ID_CALIBRATION_MARK_40X40,   /* normal pixelmap id             */
+    GX_PIXELMAP_ID_CALIBRATION_MARK_RED_40X40  /* selected pixelmap id         */
+};
+GX_ICON_PROPERTIES Cal_Window_tr_icon_properties =
+{
+    GX_PIXELMAP_ID_CALIBRATION_MARK_40X40,   /* normal pixelmap id             */
+    GX_PIXELMAP_ID_CALIBRATION_MARK_RED_40X40  /* selected pixelmap id         */
+};
+GX_ICON_PROPERTIES Cal_Window_bl_icon_properties =
+{
+    GX_PIXELMAP_ID_CALIBRATION_MARK_40X40,   /* normal pixelmap id             */
+    GX_PIXELMAP_ID_CALIBRATION_MARK_RED_40X40  /* selected pixelmap id         */
+};
+GX_ICON_PROPERTIES Cal_Window_br_icon_properties =
+{
+    GX_PIXELMAP_ID_CALIBRATION_MARK_40X40,   /* normal pixelmap id             */
+    GX_PIXELMAP_ID_CALIBRATION_MARK_RED_40X40  /* selected pixelmap id         */
+};
+
+GX_CONST GX_STUDIO_WIDGET Cal_Window_br_icon_define =
+{
+    "br_icon",
+    GX_TYPE_ICON,                            /* widget type                    */
+    br_icon_id,                              /* widget id                      */
+    #if defined(GX_WIDGET_USER_DATA)
+    0,                                       /* user data                      */
+    #endif
+    GX_STYLE_BORDER_NONE|GX_STYLE_ENABLED|GX_STYLE_HALIGN_LEFT|GX_STYLE_VALIGN_TOP,   /* style flags */
+    GX_STATUS_ACCEPTS_FOCUS,                 /* status flags                   */
+    sizeof(GX_ICON),                         /* control block size             */
+    GX_COLOR_ID_WIDGET_FILL,                 /* normal color id                */
+    GX_COLOR_ID_SELECTED_FILL,               /* selected color id              */
+    GX_COLOR_ID_DISABLED_FILL,               /* disabled color id              */
+    gx_studio_icon_create,                   /* create function                */
+    GX_NULL,                                 /* drawing function override      */
+    GX_NULL,                                 /* event function override        */
+    {420, 212, 459, 251},                    /* widget size                    */
+    GX_NULL,                                 /* no next widget                 */
+    GX_NULL,                                 /* no child widgets               */ 
+    offsetof(CAL_WINDOW_CONTROL_BLOCK, Cal_Window_br_icon), /* control block   */
+    (void *) &Cal_Window_br_icon_properties  /* extended properties            */
+};
+
+GX_CONST GX_STUDIO_WIDGET Cal_Window_bl_icon_define =
+{
+    "bl_icon",
+    GX_TYPE_ICON,                            /* widget type                    */
+    bl_icon_id,                              /* widget id                      */
+    #if defined(GX_WIDGET_USER_DATA)
+    0,                                       /* user data                      */
+    #endif
+    GX_STYLE_BORDER_NONE|GX_STYLE_ENABLED|GX_STYLE_HALIGN_LEFT|GX_STYLE_VALIGN_TOP,   /* style flags */
+    GX_STATUS_ACCEPTS_FOCUS,                 /* status flags                   */
+    sizeof(GX_ICON),                         /* control block size             */
+    GX_COLOR_ID_WIDGET_FILL,                 /* normal color id                */
+    GX_COLOR_ID_SELECTED_FILL,               /* selected color id              */
+    GX_COLOR_ID_DISABLED_FILL,               /* disabled color id              */
+    gx_studio_icon_create,                   /* create function                */
+    GX_NULL,                                 /* drawing function override      */
+    GX_NULL,                                 /* event function override        */
+    {20, 212, 59, 251},                      /* widget size                    */
+    &Cal_Window_br_icon_define,              /* next widget definition         */
+    GX_NULL,                                 /* no child widgets               */ 
+    offsetof(CAL_WINDOW_CONTROL_BLOCK, Cal_Window_bl_icon), /* control block   */
+    (void *) &Cal_Window_bl_icon_properties  /* extended properties            */
+};
+
+GX_CONST GX_STUDIO_WIDGET Cal_Window_tr_icon_define =
+{
+    "tr_icon",
+    GX_TYPE_ICON,                            /* widget type                    */
+    tr_icon_id,                              /* widget id                      */
+    #if defined(GX_WIDGET_USER_DATA)
+    0,                                       /* user data                      */
+    #endif
+    GX_STYLE_BORDER_NONE|GX_STYLE_ENABLED|GX_STYLE_HALIGN_LEFT|GX_STYLE_VALIGN_TOP,   /* style flags */
+    GX_STATUS_ACCEPTS_FOCUS,                 /* status flags                   */
+    sizeof(GX_ICON),                         /* control block size             */
+    GX_COLOR_ID_WIDGET_FILL,                 /* normal color id                */
+    GX_COLOR_ID_SELECTED_FILL,               /* selected color id              */
+    GX_COLOR_ID_DISABLED_FILL,               /* disabled color id              */
+    gx_studio_icon_create,                   /* create function                */
+    GX_NULL,                                 /* drawing function override      */
+    GX_NULL,                                 /* event function override        */
+    {420, 20, 459, 59},                      /* widget size                    */
+    &Cal_Window_bl_icon_define,              /* next widget definition         */
+    GX_NULL,                                 /* no child widgets               */ 
+    offsetof(CAL_WINDOW_CONTROL_BLOCK, Cal_Window_tr_icon), /* control block   */
+    (void *) &Cal_Window_tr_icon_properties  /* extended properties            */
+};
+
+GX_CONST GX_STUDIO_WIDGET Cal_Window_tl_icon_define =
+{
+    "tl_icon",
+    GX_TYPE_ICON,                            /* widget type                    */
+    tl_icon_id,                              /* widget id                      */
+    #if defined(GX_WIDGET_USER_DATA)
+    0,                                       /* user data                      */
+    #endif
+    GX_STYLE_BORDER_NONE|GX_STYLE_ENABLED|GX_STYLE_HALIGN_LEFT|GX_STYLE_VALIGN_TOP,   /* style flags */
+    GX_STATUS_ACCEPTS_FOCUS,                 /* status flags                   */
+    sizeof(GX_ICON),                         /* control block size             */
+    GX_COLOR_ID_WIDGET_FILL,                 /* normal color id                */
+    GX_COLOR_ID_SELECTED_FILL,               /* selected color id              */
+    GX_COLOR_ID_DISABLED_FILL,               /* disabled color id              */
+    gx_studio_icon_create,                   /* create function                */
+    GX_NULL,                                 /* drawing function override      */
+    GX_NULL,                                 /* event function override        */
+    {20, 20, 59, 59},                        /* widget size                    */
+    &Cal_Window_tr_icon_define,              /* next widget definition         */
+    GX_NULL,                                 /* no child widgets               */ 
+    offsetof(CAL_WINDOW_CONTROL_BLOCK, Cal_Window_tl_icon), /* control block   */
+    (void *) &Cal_Window_tl_icon_properties  /* extended properties            */
+};
+
+GX_STUDIO_ACTION Cal_Window_on_ok_button_eventactions[2] = {
+    {GX_ACTION_TYPE_SHOW, 0, &display_root_window, &Cal_Window, GX_NULL},
+    {0, 0, GX_NULL, GX_NULL, GX_NULL}
+};
+
+static GX_STUDIO_EVENT_ENTRY gx_studio_Cal_Window_event_table[] = {
+    { Ok_Button_Event, 0, Cal_Window_on_ok_button_eventactions},
+    {0, 0, GX_NULL}
+};
+
+GX_STUDIO_EVENT_PROCESS Cal_Window_event_chain = {gx_studio_Cal_Window_event_table, (UINT (*)(GX_WIDGET *, GX_EVENT *))gx_window_event_process};
+static UINT gx_studio_Cal_Window_event_process(GX_WIDGET *target, GX_EVENT *event_ptr)
+{
+    return (gx_studio_auto_event_handler(target, event_ptr, &Cal_Window_event_chain));
+}
+
+
+GX_CONST GX_STUDIO_WIDGET Cal_Window_define =
+{
+    "Cal_Window",
+    GX_TYPE_WINDOW,                          /* widget type                    */
+    cal_window_id,                           /* widget id                      */
+    #if defined(GX_WIDGET_USER_DATA)
+    0,                                       /* user data                      */
+    #endif
+    GX_STYLE_BORDER_NONE|GX_STYLE_ENABLED,   /* style flags                    */
+    GX_STATUS_ACCEPTS_FOCUS,                 /* status flags                   */
+    sizeof(CAL_WINDOW_CONTROL_BLOCK),        /* control block size             */
+    GX_COLOR_ID_WINDOW_BORDER,               /* normal color id                */
+    GX_COLOR_ID_WINDOW_BORDER,               /* selected color id              */
+    GX_COLOR_ID_DISABLED_FILL,               /* disabled color id              */
+    gx_studio_window_create,                 /* create function                */
+    GX_NULL,                                 /* drawing function override      */
+    (UINT (*)(GX_WIDGET *, GX_EVENT *)) gx_studio_Cal_Window_event_process, /* event function override */
+    {0, 0, 479, 271},                        /* widget size                    */
+    GX_NULL,                                 /* next widget                    */
+    &Cal_Window_tl_icon_define,              /* child widget                   */
+    0,                                       /* control block                  */
+    (void *) &Cal_Window_properties          /* extended properties            */
+};
 GX_WINDOW_PROPERTIES info_window_properties =
 {
     0                                        /* wallpaper pixelmap id          */
@@ -784,6 +946,7 @@ GX_CONST GX_STUDIO_WIDGET main_window_define =
 };
 GX_CONST GX_STUDIO_WIDGET_ENTRY _3dprint_lcd_widget_table[] =
 {
+    { &Cal_Window_define, (GX_WIDGET *) &Cal_Window },
     { &info_window_define, (GX_WIDGET *) &info_window },
     { &main_window_define, (GX_WIDGET *) &main_window },
     {GX_NULL, GX_NULL}

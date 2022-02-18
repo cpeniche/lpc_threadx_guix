@@ -2,16 +2,25 @@
 #include "lpc_types.h"
 #include "chip.h"
 #include "tx_api.h"
+#include "gx_api.h"
 #include "chip_lpc177x_8x.h"
 #include "touch_driver.h"
 #include "ssp_17xx_40xx.h"
 #include "main.h"
+#include "3dprint_lcd_specifications.h"
 
 #define SSPx LPC_SSP0
 #define CS_PIN 23
 #define PORT LPC_GPIO2
 #define CS_EN PORT->CLR |= (1 << CS_PIN);
 #define CS_DIS PORT->SET |= (1 << CS_PIN);
+
+#define OK_BTN_PORT LPC_GPIO
+
+
+#define EN_INT  NVIC->ISER[1] |= 1<< 6;
+#define DIS_INT NVIC->ICER[1] |= 1<< 6;
+
 
 void Touch_Screen::IO_config()
 {
@@ -34,15 +43,11 @@ void Touch_Screen::IO_config()
     /* Initialize Peripheral */
     Chip_GPIOINT_Init(LPC_GPIOINT);
 
-    /*Configure port for interrupt falling edge */
+    /*Configure p2.11 for interrupt falling edge */
     Chip_GPIOINT_SetIntFalling(LPC_GPIOINT,GPIOINT_PORT2,1<<11);
 
-    /* Enable interrupt */
-    NVIC->ISER[1] |= 1<< 6;
-
-    /* Clear pending interrupt*/
-    Chip_GPIOINT_ClearIntStatus(LPC_GPIOINT,GPIOINT_PORT2,1<<11);
-    
+    /*Configure p0.21 for interrupt falling edge */
+    Chip_GPIOINT_SetIntFalling(LPC_GPIOINT,GPIOINT_PORT0,1<<21);
 }
 
 void Touch_Screen::Init()
@@ -97,13 +102,29 @@ CHAR touch_stack[STACK_SIZE]  __attribute__((section(".sram")));
 
 void GPIO_IRQHandler()
 {
-    UINT status;
+    uint32_t status;
+    GX_EVENT event;
     
-    /* Cleare pending interrupt*/
-    Chip_GPIOINT_ClearIntStatus(LPC_GPIOINT,GPIOINT_PORT2,1<<11);
+    status = Chip_GPIOINT_GetStatusFalling(LPC_GPIOINT,GPIOINT_PORT2);
 
-    /* Unblock touch thread */
-    Tdrv.int_flag = 1;
+    if (status & 1<<11)
+    {
+        /* Clear pending interrupt for port p2.11*/
+        Chip_GPIOINT_ClearIntStatus(LPC_GPIOINT,GPIOINT_PORT2,1<<11);
+
+        /* Unblock touch thread */
+        Tdrv.int_flag++;
+    }
+    else
+    {
+        /* Clear pending interrupt for port p0.21*/
+        Chip_GPIOINT_ClearIntStatus(LPC_GPIOINT,GPIOINT_PORT0,1<<21);
+        
+        event.gx_event_type=Ok_Button_Event;
+        event.gx_event_target="Cal_Window";
+        
+        gx_system_event_send(&event);
+    }
 }
 
 
@@ -114,23 +135,33 @@ void touch_thread_entry(ULONG args)
   float filter_data[2], filter_data_1[2]={0};
   static float alpha=0.3, pressure;
   uint16_t rx_plate=805;
+
+
+  /* Send touch driver to power down */
+  Tdrv.get_pos(X_POS,PD0);
   
   while(true)
   {
     
-    /* send command to power down the touch chip*/
-    Tdrv.get_pos(X_POS,PD0);
+    /* Enable Interrupts */
+    EN_INT
 
-    /* wait for a touch */
+    /* reset flag and wait for a touch */
     Tdrv.int_flag=0;
 
-    while(Tdrv.int_flag==0);
+    while(Tdrv.int_flag==0)
+    {
+        tx_thread_relinquish();
+    }
+
+    /* Disable interrupts */
+    DIS_INT
 
     /* Keep the adc on between measurements and avoid
        false interrupts for Pen interrupt pin*/
-    PD0 = 0x1;
+    PD0 = 0x0;
     
-    /* take n samples of x position*/
+    /* take n samples of x and y position*/
     do 
     { 
       /* Read x and y position */
@@ -149,13 +180,10 @@ void touch_thread_entry(ULONG args)
       filter_samples++;
     }while (filter_samples < 5);
 
-    /* update valuse after filter applided */
+    /* update values after filter applied */
     Tdrv.x_pos=filter_data[X_POS];
     Tdrv.y_pos=filter_data[Y_POS];
     
-    /* Send adc to power down */
-    PD0 = 0x0;
-
     /* reset sample count */
     filter_samples=0;
         

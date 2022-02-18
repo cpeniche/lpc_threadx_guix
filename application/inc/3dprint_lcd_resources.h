@@ -6,12 +6,12 @@
 /*  Studio User Guide, or visit our web site at azure.com/rtos                 */
 /*                                                                             */
 /*  GUIX Studio Revision 6.1.10.0                                              */
-/*  Date (dd.mm.yyyy):  5. 2.2022   Time (hh:mm): 22:53                        */
+/*  Date (dd.mm.yyyy): 17. 2.2022   Time (hh:mm): 22:27                        */
 /*******************************************************************************/
 
 
-#ifndef _3DPRINT_LCD_DISPLAY_RESOURCES_H_
-#define _3DPRINT_LCD_DISPLAY_RESOURCES_H_
+#ifndef __3DPRINT_LCD_DISPLAY_RESOURCES_H_
+#define __3DPRINT_LCD_DISPLAY_RESOURCES_H_
 
 #include "gx_api.h"
 
@@ -41,12 +41,14 @@
 
 #define GX_PIXELMAP_ID_ADJUST_ICON_80X80 5
 #define GX_PIXELMAP_ID_BED_LEVEL_ICON_80X80 6
-#define GX_PIXELMAP_ID_DONE_ICON_80X80 7
-#define GX_PIXELMAP_ID_HEATED_PLATE_ICON 8
-#define GX_PIXELMAP_ID_INFO_ICON_80X80 9
-#define GX_PIXELMAP_ID_NOZZLE_TEMPERATURE_ICON_48X48 10
-#define GX_PIXELMAP_ID_SETTINGS_80X80 11
-#define DISPLAY_PIXELMAP_TABLE_SIZE 12
+#define GX_PIXELMAP_ID_CALIBRATION_MARK_40X40 7
+#define GX_PIXELMAP_ID_CALIBRATION_MARK_RED_40X40 8
+#define GX_PIXELMAP_ID_DONE_ICON_80X80 9
+#define GX_PIXELMAP_ID_HEATED_PLATE_ICON 10
+#define GX_PIXELMAP_ID_INFO_ICON_80X80 11
+#define GX_PIXELMAP_ID_NOZZLE_TEMPERATURE_ICON_48X48 12
+#define GX_PIXELMAP_ID_SETTINGS_80X80 13
+#define DISPLAY_PIXELMAP_TABLE_SIZE 14
 
 /* String Ids                                                                  */
 
