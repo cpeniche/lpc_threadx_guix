@@ -120,9 +120,13 @@ void GPIO_IRQHandler()
         /* Clear pending interrupt for port p0.21*/
         Chip_GPIOINT_ClearIntStatus(LPC_GPIOINT,GPIOINT_PORT0,1<<21);
         
+        /* Load event type */
         event.gx_event_type=Ok_Button_Event;
-        event.gx_event_target="Cal_Window";
-        
+
+        /* Specify which widget to send the event */
+        event.gx_event_target = (GX_WIDGET *)&Cal_Window;
+                
+        /* Send event */        
         gx_system_event_send(&event);
     }
 }
