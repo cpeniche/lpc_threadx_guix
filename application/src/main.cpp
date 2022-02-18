@@ -11,25 +11,20 @@
 #include "3dprint_lcd_resources.h"
 #include "3dprint_lcd_specifications.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define STACK_SIZE (2 * 1024)
 CHAR main_stack[STACK_SIZE];
 CHAR gui_stack[STACK_SIZE]    __attribute__((section(".sram")));
-CHAR touch_stack[STACK_SIZE]  __attribute__((section(".sram")));
-
-
 
 static void main_thread_entry(ULONG arg);
 static void gui_thread_entry(ULONG args);
-static void touch_thread_entry(ULONG args);
 
 /* Define global data structures.   */
 TX_THREAD main_thread;
 TX_THREAD gui_thread;
-TX_THREAD touch_thread;
-
-/* semaphore definitions */
-TX_SEMAPHORE touch_semaphore;
 
 APP_THREAD_INFO thread_list[]={
   {
@@ -136,51 +131,6 @@ static void gui_thread_entry(ULONG args)
   gx_system_start();
 }
 
-static void touch_thread_entry(ULONG args)
-{
-  UINT status;
-  uint8_t filter_samples=0;
-  float filter_data[2], filter_data_1[2]={0};
-  static float alpha=0.3, pressure;
-  uint16_t rx_plate=805;
-  //305
-
-  //tx_semaphore_create(&touch_semaphore,(char *)"touch_semaphore",0);
-
-  while(true)
-  {
-    
-    Tdrv.power_down();
-
-    Tdrv.int_flag=0;
-
-    while(Tdrv.int_flag==0);
-    
-    /* take n samples of x position*/
-    do 
-    { 
-      /* Read x and y position */
-      Tdrv.get_pos(X_POS,0);
-      Tdrv.get_pos(Y_POS,0);
-
-      /* apply low pass filter to x position*/
-      filter_data[X_POS] = alpha*filter_data_1[X_POS] + (1-alpha)*Tdrv.pos[X_POS][0];
-      filter_data_1[X_POS] = filter_data[X_POS];
-
-      /* apply low pass filter to y position*/
-      filter_data[Y_POS] = alpha*filter_data_1[Y_POS] + (1-alpha)*Tdrv.pos[Y_POS][0];
-      filter_data_1[Y_POS] = filter_data[Y_POS];
-
-      /* Increment sample counts*/
-      filter_samples++;
-    }while (filter_samples < 5);
-    
-    filter_samples=0;
-    
-    /* Calculate pressure */
-    //pressure = rx_plate*(filter_data/4096)*((Tdrv.pos[Z2_POS][0]/Tdrv.pos[Z1_POS][0])-1);
-    
-  }
-
-
+#ifdef __cplusplus
 }
+#endif
