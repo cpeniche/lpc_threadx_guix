@@ -102,12 +102,10 @@ CHAR touch_stack[STACK_SIZE]  __attribute__((section(".sram")));
 
 void GPIO_IRQHandler()
 {
-    uint32_t status;
+    
     GX_EVENT event;
     
-    status = Chip_GPIOINT_GetStatusFalling(LPC_GPIOINT,GPIOINT_PORT2);
-
-    if (status & 1<<11)
+    if (Chip_GPIOINT_GetStatusFalling(LPC_GPIOINT,GPIOINT_PORT2) & 1<<11)
     {
         /* Clear pending interrupt for port p2.11*/
         Chip_GPIOINT_ClearIntStatus(LPC_GPIOINT,GPIOINT_PORT2,1<<11);
@@ -115,16 +113,16 @@ void GPIO_IRQHandler()
         /* Unblock touch thread */
         Tdrv.int_flag++;
     }
-    else
+    else if (Chip_GPIOINT_GetStatusFalling(LPC_GPIOINT,GPIOINT_PORT0) & 1<<21)
     {
         /* Clear pending interrupt for port p0.21*/
         Chip_GPIOINT_ClearIntStatus(LPC_GPIOINT,GPIOINT_PORT0,1<<21);
         
         /* Load event type */
-        event.gx_event_type=Ok_Button_Event;
+        event.gx_event_type=ok_push;
 
         /* Specify which widget to send the event */
-        event.gx_event_target = (GX_WIDGET *)&Cal_Window;
+        event.gx_event_target = GX_NULL; //(GX_WIDGET *)&main_window;
                 
         /* Send event */        
         gx_system_event_send(&event);

@@ -6,7 +6,7 @@
 /*  Studio User Guide, or visit our web site at azure.com/rtos                 */
 /*                                                                             */
 /*  GUIX Studio Revision 6.1.10.0                                              */
-/*  Date (dd.mm.yyyy): 17. 2.2022   Time (hh:mm): 22:27                        */
+/*  Date (dd.mm.yyyy): 18. 2.2022   Time (hh:mm): 22:28                        */
 /*******************************************************************************/
 
 
@@ -2319,17 +2319,23 @@ GX_CONST GX_UBYTE display_STRING_2_English[] = "30/30";
 GX_CONST GX_UBYTE display_STRING_3_English[] = "30/30 deg C";
 GX_CONST GX_UBYTE display_STRING_4_English[] = "30/30 C";
 GX_CONST GX_UBYTE display_STRING_5_English[] = "25/25 C";
+GX_CONST GX_UBYTE display_STRING_6_English[] = "CALIBRATION ";
+GX_CONST GX_UBYTE display_STRING_7_English[] = "CALIBRATION WINDOW";
+GX_CONST GX_UBYTE display_STRING_8_English[] = "TOUCH CALIBRATION";
 
 /* String Table for display language English                                   */
 
-GX_CONST GX_STRING display_English_string_table[6] =
+GX_CONST GX_STRING display_English_string_table[9] =
 {
     {GX_NULL, 0},
     {(GX_CONST GX_CHAR *)display_STRING_1_English, sizeof(display_STRING_1_English) - 1},
     {(GX_CONST GX_CHAR *)display_STRING_2_English, sizeof(display_STRING_2_English) - 1},
     {(GX_CONST GX_CHAR *)display_STRING_3_English, sizeof(display_STRING_3_English) - 1},
     {(GX_CONST GX_CHAR *)display_STRING_4_English, sizeof(display_STRING_4_English) - 1},
-    {(GX_CONST GX_CHAR *)display_STRING_5_English, sizeof(display_STRING_5_English) - 1}
+    {(GX_CONST GX_CHAR *)display_STRING_5_English, sizeof(display_STRING_5_English) - 1},
+    {(GX_CONST GX_CHAR *)display_STRING_6_English, sizeof(display_STRING_6_English) - 1},
+    {(GX_CONST GX_CHAR *)display_STRING_7_English, sizeof(display_STRING_7_English) - 1},
+    {(GX_CONST GX_CHAR *)display_STRING_8_English, sizeof(display_STRING_8_English) - 1}
 };
 
 /*  Language Table                                                             */

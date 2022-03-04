@@ -121,6 +121,8 @@ static void gui_thread_entry(ULONG args)
                               DISPLAY_THEME_1,        /* Theme to install */
                               &root);                     /* Root window pointer */
 
+  gx_studio_named_widget_create((char *)"Cal_Window", (GX_WIDGET *)root, GX_NULL);
+  
   /* Create the screen - attached to root window. */
   gx_studio_named_widget_create((char *)"main_window", (GX_WIDGET *)root, GX_NULL);
 

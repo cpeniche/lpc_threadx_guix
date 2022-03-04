@@ -6,3 +6,4 @@ obj-y += sram.o
 obj-y += 3dprint_lcd_resources.o
 obj-y += 3dprint_lcd_specifications.o
 obj-y += touch_driver.o
+obj-y += cal_window.o
