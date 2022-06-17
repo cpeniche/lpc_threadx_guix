@@ -6,7 +6,7 @@
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
 /*  GUIX Studio Revision 6.1.11.0                                              */
-/*  Date (dd.mm.yyyy): 16. 6.2022   Time (hh:mm): 23:38                        */
+/*  Date (dd.mm.yyyy): 16. 6.2022   Time (hh:mm): 23:59                        */
 /*******************************************************************************/
 
 
@@ -609,9 +609,8 @@ GX_CONST GX_STUDIO_WIDGET info_window_done_btn_define =
     (void *) &info_window_done_btn_properties /* extended properties           */
 };
 
-GX_STUDIO_ACTION info_window__done_btn_id_gx_event_clicked_actions[3] = {
-    {GX_ACTION_TYPE_HIDE, 0, &display_root_window, &info_window, GX_NULL},
-    {GX_ACTION_TYPE_SHOW, 0, &display_root_window, &main_window, GX_NULL},
+GX_STUDIO_ACTION info_window__done_btn_id_gx_event_clicked_actions[2] = {
+    {GX_ACTION_TYPE_TOGGLE, 0, &display_root_window, &main_window, GX_NULL},
     {0, 0, GX_NULL, GX_NULL, GX_NULL}
 };
 
@@ -907,9 +906,8 @@ GX_CONST GX_STUDIO_WIDGET main_window_nozzle_define =
     (void *) &main_window_nozzle_properties  /* extended properties            */
 };
 
-GX_STUDIO_ACTION main_window__info_btn_id_gx_event_clicked_actions[3] = {
-    {GX_ACTION_TYPE_HIDE, 0, &display_root_window, &main_window, GX_NULL},
-    {GX_ACTION_TYPE_SHOW, 0, &main_window, &info_window, GX_NULL},
+GX_STUDIO_ACTION main_window__info_btn_id_gx_event_clicked_actions[2] = {
+    {GX_ACTION_TYPE_TOGGLE, 0, &display_root_window, &info_window, GX_NULL},
     {0, 0, GX_NULL, GX_NULL, GX_NULL}
 };
 
