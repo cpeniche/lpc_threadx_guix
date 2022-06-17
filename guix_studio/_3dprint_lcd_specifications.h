@@ -5,8 +5,8 @@
 /*  specification file(s). For more information please refer to the Azure RTOS */
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
-/*  GUIX Studio Revision 6.1.10.0                                              */
-/*  Date (dd.mm.yyyy): 18. 2.2022   Time (hh:mm): 22:28                        */
+/*  GUIX Studio Revision 6.1.11.0                                              */
+/*  Date (dd.mm.yyyy): 16. 6.2022   Time (hh:mm): 20:57                        */
 /*******************************************************************************/
 
 
@@ -27,11 +27,10 @@ extern   "C" {
 #define tr_icon_id 3
 #define bl_icon_id 4
 #define br_icon_id 5
-#define cal_label_id 6
-#define done_btn_id 7
-#define nozzle_id 8
-#define bed_id 9
-#define info_btn_id 10
+#define done_btn_id 6
+#define nozzle_id 7
+#define bed_id 8
+#define info_btn_id 9
 
 
 /* Define animation ids                                                        */
@@ -42,7 +41,7 @@ extern   "C" {
 /* Define user event ids                                                       */
 
 enum user_defined_events{
-    ok_push = GX_FIRST_USER_EVENT,
+    Ok_Button_Event = GX_FIRST_USER_EVENT,
     GX_NEXT_USER_EVENT_ID
 };
 
@@ -146,7 +145,6 @@ typedef struct CAL_WINDOW_CONTROL_BLOCK_STRUCT
     GX_ICON Cal_Window_tr_icon;
     GX_ICON Cal_Window_bl_icon;
     GX_ICON Cal_Window_br_icon;
-    GX_SINGLE_LINE_TEXT_INPUT Cal_Window_text_input;
 } CAL_WINDOW_CONTROL_BLOCK;
 
 typedef struct INFO_WINDOW_CONTROL_BLOCK_STRUCT
@@ -179,7 +177,6 @@ extern MAIN_WINDOW_CONTROL_BLOCK main_window;
 
 /* Declare event process functions, draw functions, and callback functions     */
 
-UINT Cal_Window_Event_Process(GX_WINDOW *widget, GX_EVENT *event_ptr);
 
 /* Declare the GX_STUDIO_DISPLAY_INFO structure                                */
 

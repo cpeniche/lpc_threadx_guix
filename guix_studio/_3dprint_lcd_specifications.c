@@ -5,12 +5,13 @@
 /*  specification file(s). For more information please refer to the Azure RTOS */
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
-/*  GUIX Studio Revision 6.1.10.0                                              */
-/*  Date (dd.mm.yyyy): 18. 2.2022   Time (hh:mm): 22:28                        */
+/*  GUIX Studio Revision 6.1.11.0                                              */
+/*  Date (dd.mm.yyyy): 16. 6.2022   Time (hh:mm): 20:57                        */
 /*******************************************************************************/
 
 
 #define GUIX_STUDIO_GENERATED_FILE
+#include "display.h"
 #include <stddef.h>
 #include "_3dprint_lcd_resources.h"
 #include "_3dprint_lcd_specifications.h"
@@ -363,6 +364,10 @@ UINT gx_studio_icon_create(GX_CONST GX_STUDIO_WIDGET *info, GX_WIDGET *control_b
     {
         gx_icon_pixelmap_set(icon, props->normal_pixelmap_id, props->selected_pixelmap_id);
     }
+    else
+    {
+        gx_widget_resize((GX_WIDGET *)icon, (GX_RECTANGLE *)&info->size);
+    }
     return status;
 }
 
@@ -433,43 +438,6 @@ GX_ICON_PROPERTIES Cal_Window_br_icon_properties =
     GX_PIXELMAP_ID_CALIBRATION_MARK_40X40,   /* normal pixelmap id             */
     GX_PIXELMAP_ID_CALIBRATION_MARK_RED_40X40  /* selected pixelmap id         */
 };
-GX_CHAR Cal_Window_text_input_buffer[100];
-GX_SINGLE_LINE_TEXT_INPUT_PROPERTIES Cal_Window_text_input_properties =
-{
-    GX_STRING_ID_STRING_8,                   /* string id                      */
-    GX_FONT_ID_SYSTEM,                       /* font id                        */
-    GX_COLOR_ID_TEXT,                        /* normal text color              */
-    GX_COLOR_ID_SELECTED_TEXT,               /* selected text color            */
-    GX_COLOR_ID_DISABLED_TEXT,               /* disabled text color            */
-    GX_COLOR_ID_WINDOW_BORDER,               /* readonly fill color            */
-    GX_COLOR_ID_TEXT,                        /* readonly text color            */
-    Cal_Window_text_input_buffer,            /* buffer                         */
-    100,                                     /* buffer size                    */
-};
-
-GX_CONST GX_STUDIO_WIDGET Cal_Window_text_input_define =
-{
-    "text_input",
-    GX_TYPE_SINGLE_LINE_TEXT_INPUT,          /* widget type                    */
-    cal_label_id,                            /* widget id                      */
-    #if defined(GX_WIDGET_USER_DATA)
-    0,                                       /* user data                      */
-    #endif
-    GX_STYLE_BORDER_RECESSED|GX_STYLE_ENABLED|GX_STYLE_TEXT_INPUT_READONLY|GX_STYLE_TEXT_CENTER,   /* style flags */
-    GX_STATUS_ACCEPTS_FOCUS,                 /* status flags                   */
-    sizeof(GX_SINGLE_LINE_TEXT_INPUT),       /* control block size             */
-    GX_COLOR_ID_TEXT_INPUT_FILL,             /* normal color id                */
-    GX_COLOR_ID_SELECTED_FILL,               /* selected color id              */
-    GX_COLOR_ID_DISABLED_FILL,               /* disabled color id              */
-    gx_studio_text_input_create,             /* create function                */
-    GX_NULL,                                 /* drawing function override      */
-    GX_NULL,                                 /* event function override        */
-    {139, 105, 338, 154},                    /* widget size                    */
-    GX_NULL,                                 /* no next widget                 */
-    GX_NULL,                                 /* no child widgets               */ 
-    offsetof(CAL_WINDOW_CONTROL_BLOCK, Cal_Window_text_input), /* control block */
-    (void *) &Cal_Window_text_input_properties /* extended properties          */
-};
 
 GX_CONST GX_STUDIO_WIDGET Cal_Window_br_icon_define =
 {
@@ -489,7 +457,7 @@ GX_CONST GX_STUDIO_WIDGET Cal_Window_br_icon_define =
     GX_NULL,                                 /* drawing function override      */
     GX_NULL,                                 /* event function override        */
     {420, 212, 459, 251},                    /* widget size                    */
-    &Cal_Window_text_input_define,           /* next widget definition         */
+    GX_NULL,                                 /* no next widget                 */
     GX_NULL,                                 /* no child widgets               */ 
     offsetof(CAL_WINDOW_CONTROL_BLOCK, Cal_Window_br_icon), /* control block   */
     (void *) &Cal_Window_br_icon_properties  /* extended properties            */
@@ -551,7 +519,7 @@ GX_CONST GX_STUDIO_WIDGET Cal_Window_tl_icon_define =
     #if defined(GX_WIDGET_USER_DATA)
     0,                                       /* user data                      */
     #endif
-    GX_STYLE_BORDER_NONE|GX_STYLE_DRAW_SELECTED|GX_STYLE_ENABLED|GX_STYLE_HALIGN_LEFT|GX_STYLE_VALIGN_TOP,   /* style flags */
+    GX_STYLE_BORDER_NONE|GX_STYLE_ENABLED|GX_STYLE_HALIGN_LEFT|GX_STYLE_VALIGN_TOP,   /* style flags */
     GX_STATUS_ACCEPTS_FOCUS,                 /* status flags                   */
     sizeof(GX_ICON),                         /* control block size             */
     GX_COLOR_ID_WIDGET_FILL,                 /* normal color id                */
@@ -566,6 +534,23 @@ GX_CONST GX_STUDIO_WIDGET Cal_Window_tl_icon_define =
     offsetof(CAL_WINDOW_CONTROL_BLOCK, Cal_Window_tl_icon), /* control block   */
     (void *) &Cal_Window_tl_icon_properties  /* extended properties            */
 };
+
+GX_STUDIO_ACTION Cal_Window_on_ok_button_eventactions[2] = {
+    {GX_ACTION_TYPE_SHOW, 0, &display_root_window, &Cal_Window, GX_NULL},
+    {0, 0, GX_NULL, GX_NULL, GX_NULL}
+};
+
+static GX_STUDIO_EVENT_ENTRY gx_studio_Cal_Window_event_table[] = {
+    { Ok_Button_Event, 0, Cal_Window_on_ok_button_eventactions},
+    {0, 0, GX_NULL}
+};
+
+GX_STUDIO_EVENT_PROCESS Cal_Window_event_chain = {gx_studio_Cal_Window_event_table, (UINT (*)(GX_WIDGET *, GX_EVENT *))gx_window_event_process};
+static UINT gx_studio_Cal_Window_event_process(GX_WIDGET *target, GX_EVENT *event_ptr)
+{
+    return (gx_studio_auto_event_handler(target, event_ptr, &Cal_Window_event_chain));
+}
+
 
 GX_CONST GX_STUDIO_WIDGET Cal_Window_define =
 {
@@ -583,7 +568,7 @@ GX_CONST GX_STUDIO_WIDGET Cal_Window_define =
     GX_COLOR_ID_DISABLED_FILL,               /* disabled color id              */
     gx_studio_window_create,                 /* create function                */
     GX_NULL,                                 /* drawing function override      */
-    (UINT (*)(GX_WIDGET *, GX_EVENT *)) Cal_Window_Event_Process, /* event function override */
+    (UINT (*)(GX_WIDGET *, GX_EVENT *)) gx_studio_Cal_Window_event_process, /* event function override */
     {0, 0, 479, 271},                        /* widget size                    */
     GX_NULL,                                 /* next widget                    */
     &Cal_Window_tl_icon_define,              /* child widget                   */
@@ -923,24 +908,14 @@ GX_CONST GX_STUDIO_WIDGET main_window_nozzle_define =
     (void *) &main_window_nozzle_properties  /* extended properties            */
 };
 
-GX_STUDIO_ACTION main_window__info_btn_id_gx_event_clicked_actions[4] = {
+GX_STUDIO_ACTION main_window__info_btn_id_gx_event_clicked_actions[3] = {
     {GX_ACTION_TYPE_HIDE, 0, &display_root_window, &main_window, GX_NULL},
-    {GX_ACTION_TYPE_SHOW, 0, &display_root_window, &info_window, GX_NULL},
-    {GX_ACTION_TYPE_HIDE, 0, &display_root_window, &Cal_Window, GX_NULL},
-    {0, 0, GX_NULL, GX_NULL, GX_NULL}
-};
-
-
-GX_STUDIO_ACTION main_window_on_ok_pushactions[4] = {
-    {GX_ACTION_TYPE_HIDE, 0, &display_root_window, &main_window, GX_NULL},
-    {GX_ACTION_TYPE_HIDE, 0, &display_root_window, &info_window, GX_NULL},
-    {GX_ACTION_TYPE_SHOW, 0, &display_root_window, &Cal_Window, GX_NULL},
+    {GX_ACTION_TYPE_SHOW, 0, &main_window, &info_window, GX_NULL},
     {0, 0, GX_NULL, GX_NULL, GX_NULL}
 };
 
 static GX_STUDIO_EVENT_ENTRY gx_studio_main_window_event_table[] = {
     {GX_SIGNAL(info_btn_id, GX_EVENT_CLICKED), 0, main_window__info_btn_id_gx_event_clicked_actions},
-    { ok_push, 0, main_window_on_ok_pushactions},
     {0, 0, GX_NULL}
 };
 

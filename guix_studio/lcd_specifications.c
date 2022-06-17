@@ -6,12 +6,11 @@
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
 /*  GUIX Studio Revision 6.1.11.0                                              */
-/*  Date (dd.mm.yyyy): 16. 6.2022   Time (hh:mm): 20:59                        */
+/*  Date (dd.mm.yyyy): 16. 6.2022   Time (hh:mm): 23:38                        */
 /*******************************************************************************/
 
 
 #define GUIX_STUDIO_GENERATED_FILE
-#include "display.h"
 #include <stddef.h>
 #include "lcd_resources.h"
 #include "lcd_specifications.h"
