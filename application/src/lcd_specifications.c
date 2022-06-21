@@ -6,7 +6,7 @@
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
 /*  GUIX Studio Revision 6.1.11.0                                              */
-/*  Date (dd.mm.yyyy): 16. 6.2022   Time (hh:mm): 20:59                        */
+/*  Date (dd.mm.yyyy): 20. 6.2022   Time (hh:mm): 21:06                        */
 /*******************************************************************************/
 
 
@@ -22,7 +22,7 @@ MAIN_WINDOW_CONTROL_BLOCK main_window;
 GX_DISPLAY display_control_block;
 GX_WINDOW_ROOT display_root_window;
 GX_CANVAS  display_canvas_control_block;
-ULONG      display_canvas_memory[65280] __attribute__((section(".sram")));
+ULONG      display_canvas_memory[65280];
 
 extern GX_CONST GX_THEME *display_theme_table[];
 extern GX_CONST GX_STRING *display_language_table[];
@@ -690,10 +690,10 @@ GX_SINGLE_LINE_TEXT_INPUT_PROPERTIES main_window_bed_temp_properties =
     main_window_bed_temp_buffer,             /* buffer                         */
     100,                                     /* buffer size                    */
 };
-GX_PIXELMAP_BUTTON_PROPERTIES main_window_seetings_btn_properties =
+GX_PIXELMAP_BUTTON_PROPERTIES main_window_settings_btn_properties =
 {
     GX_PIXELMAP_ID_SETTINGS_80X80,           /* normal pixelmap id             */
-    0,                                       /* selected pixelmap id           */
+    GX_PIXELMAP_ID_SETTINGS_SELECTED_80X80,  /* selected pixelmap id           */
     0                                        /* disabled pixelmap id           */
 };
 GX_PIXELMAP_BUTTON_PROPERTIES main_window_bed_leveling_btn_properties =
@@ -787,28 +787,28 @@ GX_CONST GX_STUDIO_WIDGET main_window_bed_leveling_btn_define =
     (void *) &main_window_bed_leveling_btn_properties /* extended properties   */
 };
 
-GX_CONST GX_STUDIO_WIDGET main_window_seetings_btn_define =
+GX_CONST GX_STUDIO_WIDGET main_window_settings_btn_define =
 {
-    "seetings_btn",
+    "settings_btn",
     GX_TYPE_PIXELMAP_BUTTON,                 /* widget type                    */
     GX_ID_NONE,                              /* widget id                      */
     #if defined(GX_WIDGET_USER_DATA)
     0,                                       /* user data                      */
     #endif
-    GX_STYLE_BORDER_NONE|GX_STYLE_ENABLED,   /* style flags                    */
+    GX_STYLE_BORDER_THICK|GX_STYLE_ENABLED|GX_STYLE_BUTTON_TOGGLE,   /* style flags */
     GX_STATUS_ACCEPTS_FOCUS,                 /* status flags                   */
     sizeof(GX_PIXELMAP_BUTTON),              /* control block size             */
-    GX_COLOR_ID_BTN_LOWER,                   /* normal color id                */
-    GX_COLOR_ID_BTN_UPPER,                   /* selected color id              */
+    GX_COLOR_ID_WINDOW_BORDER,               /* normal color id                */
+    GX_COLOR_ID_SELECTED_FILL,               /* selected color id              */
     GX_COLOR_ID_DISABLED_FILL,               /* disabled color id              */
     gx_studio_pixelmap_button_create,        /* create function                */
     GX_NULL,                                 /* drawing function override      */
     GX_NULL,                                 /* event function override        */
-    {209, 52, 288, 131},                     /* widget size                    */
+    {209, 52, 290, 133},                     /* widget size                    */
     &main_window_bed_leveling_btn_define,    /* next widget definition         */
     GX_NULL,                                 /* no child widgets               */ 
-    offsetof(MAIN_WINDOW_CONTROL_BLOCK, main_window_seetings_btn), /* control block */
-    (void *) &main_window_seetings_btn_properties /* extended properties       */
+    offsetof(MAIN_WINDOW_CONTROL_BLOCK, main_window_settings_btn), /* control block */
+    (void *) &main_window_settings_btn_properties /* extended properties       */
 };
 
 GX_CONST GX_STUDIO_WIDGET main_window_bed_temp_define =
@@ -829,7 +829,7 @@ GX_CONST GX_STUDIO_WIDGET main_window_bed_temp_define =
     GX_NULL,                                 /* drawing function override      */
     GX_NULL,                                 /* event function override        */
     {66, 119, 130, 142},                     /* widget size                    */
-    &main_window_seetings_btn_define,        /* next widget definition         */
+    &main_window_settings_btn_define,        /* next widget definition         */
     GX_NULL,                                 /* no child widgets               */ 
     offsetof(MAIN_WINDOW_CONTROL_BLOCK, main_window_bed_temp), /* control block */
     (void *) &main_window_bed_temp_properties /* extended properties           */

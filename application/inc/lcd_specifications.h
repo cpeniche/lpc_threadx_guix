@@ -6,12 +6,12 @@
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
 /*  GUIX Studio Revision 6.1.11.0                                              */
-/*  Date (dd.mm.yyyy): 16. 6.2022   Time (hh:mm): 20:57                        */
+/*  Date (dd.mm.yyyy): 20. 6.2022   Time (hh:mm): 21:06                        */
 /*******************************************************************************/
 
 
-#ifndef __3DPRINT_LCD_SPECIFICATIONS_H_
-#define __3DPRINT_LCD_SPECIFICATIONS_H_
+#ifndef _LCD_SPECIFICATIONS_H_
+#define _LCD_SPECIFICATIONS_H_
 
 #include "gx_api.h"
 
@@ -160,7 +160,7 @@ typedef struct MAIN_WINDOW_CONTROL_BLOCK_STRUCT
     GX_SINGLE_LINE_TEXT_INPUT main_window_nozzle_temp;
     GX_ICON main_window_bed;
     GX_SINGLE_LINE_TEXT_INPUT main_window_bed_temp;
-    GX_PIXELMAP_BUTTON main_window_seetings_btn;
+    GX_PIXELMAP_BUTTON main_window_settings_btn;
     GX_PIXELMAP_BUTTON main_window_bed_leveling_btn;
     GX_PIXELMAP_BUTTON main_window_adjust_btn;
     GX_PIXELMAP_BUTTON main_window_info_btn;
