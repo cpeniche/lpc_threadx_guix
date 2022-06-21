@@ -22,7 +22,7 @@ MAIN_WINDOW_CONTROL_BLOCK main_window;
 GX_DISPLAY display_control_block;
 GX_WINDOW_ROOT display_root_window;
 GX_CANVAS  display_canvas_control_block;
-ULONG      display_canvas_memory[65280];
+ULONG      display_canvas_memory[65280] __attribute((section(".sram")));
 
 extern GX_CONST GX_THEME *display_theme_table[];
 extern GX_CONST GX_STRING *display_language_table[];
