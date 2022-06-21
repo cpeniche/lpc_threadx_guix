@@ -6,7 +6,7 @@
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
 /*  GUIX Studio Revision 6.1.11.0                                              */
-/*  Date (dd.mm.yyyy): 20. 6.2022   Time (hh:mm): 21:33                        */
+/*  Date (dd.mm.yyyy): 20. 6.2022   Time (hh:mm): 21:48                        */
 /*******************************************************************************/
 
 
@@ -22,7 +22,7 @@ MAIN_WINDOW_CONTROL_BLOCK main_window;
 GX_DISPLAY display_control_block;
 GX_WINDOW_ROOT display_root_window;
 GX_CANVAS  display_canvas_control_block;
-ULONG      display_canvas_memory[65280] __attribute__((section(".sram")));
+ULONG      display_canvas_memory[65280];
 
 extern GX_CONST GX_THEME *display_theme_table[];
 extern GX_CONST GX_STRING *display_language_table[];
@@ -711,7 +711,7 @@ GX_PIXELMAP_BUTTON_PROPERTIES main_window_adjust_btn_properties =
 GX_PIXELMAP_BUTTON_PROPERTIES main_window_info_btn_properties =
 {
     GX_PIXELMAP_ID_INFO_ICON_80X80,          /* normal pixelmap id             */
-    0,                                       /* selected pixelmap id           */
+    GX_PIXELMAP_ID_INFO_ICON_SELECTED_80X80, /* selected pixelmap id           */
     0                                        /* disabled pixelmap id           */
 };
 

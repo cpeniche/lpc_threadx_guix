@@ -6,7 +6,7 @@
 /*  Studio User Guide, or visit our web site at azure.com/rtos                 */
 /*                                                                             */
 /*  GUIX Studio Revision 6.1.11.0                                              */
-/*  Date (dd.mm.yyyy): 20. 6.2022   Time (hh:mm): 21:33                        */
+/*  Date (dd.mm.yyyy): 20. 6.2022   Time (hh:mm): 21:48                        */
 /*******************************************************************************/
 
 
@@ -46,10 +46,11 @@
 #define GX_PIXELMAP_ID_DONE_ICON_80X80 9
 #define GX_PIXELMAP_ID_HEATED_PLATE_ICON 10
 #define GX_PIXELMAP_ID_INFO_ICON_80X80 11
-#define GX_PIXELMAP_ID_NOZZLE_TEMPERATURE_ICON_48X48 12
-#define GX_PIXELMAP_ID_SETTINGS_80X80 13
-#define GX_PIXELMAP_ID_SETTINGS_SELECTED_80X80 14
-#define DISPLAY_PIXELMAP_TABLE_SIZE 15
+#define GX_PIXELMAP_ID_INFO_ICON_SELECTED_80X80 12
+#define GX_PIXELMAP_ID_NOZZLE_TEMPERATURE_ICON_48X48 13
+#define GX_PIXELMAP_ID_SETTINGS_80X80 14
+#define GX_PIXELMAP_ID_SETTINGS_SELECTED_80X80 15
+#define DISPLAY_PIXELMAP_TABLE_SIZE 16
 
 /* String Ids                                                                  */
 
