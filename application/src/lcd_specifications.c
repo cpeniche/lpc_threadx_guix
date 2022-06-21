@@ -6,7 +6,7 @@
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
 /*  GUIX Studio Revision 6.1.11.0                                              */
-/*  Date (dd.mm.yyyy): 20. 6.2022   Time (hh:mm): 21:06                        */
+/*  Date (dd.mm.yyyy): 20. 6.2022   Time (hh:mm): 21:33                        */
 /*******************************************************************************/
 
 
@@ -22,7 +22,7 @@ MAIN_WINDOW_CONTROL_BLOCK main_window;
 GX_DISPLAY display_control_block;
 GX_WINDOW_ROOT display_root_window;
 GX_CANVAS  display_canvas_control_block;
-ULONG      display_canvas_memory[65280] __attribute((section(".sram")));
+ULONG      display_canvas_memory[65280] __attribute__((section(".sram")));
 
 extern GX_CONST GX_THEME *display_theme_table[];
 extern GX_CONST GX_STRING *display_language_table[];
@@ -795,7 +795,7 @@ GX_CONST GX_STUDIO_WIDGET main_window_settings_btn_define =
     #if defined(GX_WIDGET_USER_DATA)
     0,                                       /* user data                      */
     #endif
-    GX_STYLE_BORDER_THICK|GX_STYLE_ENABLED|GX_STYLE_BUTTON_TOGGLE,   /* style flags */
+    GX_STYLE_BORDER_THICK|GX_STYLE_ENABLED,   /* style flags                   */
     GX_STATUS_ACCEPTS_FOCUS,                 /* status flags                   */
     sizeof(GX_PIXELMAP_BUTTON),              /* control block size             */
     GX_COLOR_ID_WINDOW_BORDER,               /* normal color id                */
