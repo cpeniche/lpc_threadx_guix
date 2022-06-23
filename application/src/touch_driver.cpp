@@ -7,7 +7,7 @@
 #include "touch_driver.h"
 #include "ssp_17xx_40xx.h"
 #include "main.h"
-#include "3dprint_lcd_specifications.h"
+#include "lcd_specifications.h"
 
 #define SSPx LPC_SSP0
 #define CS_PIN 23
@@ -20,6 +20,9 @@
 
 #define EN_INT  NVIC->ISER[1] |= 1<< 6;
 #define DIS_INT NVIC->ICER[1] |= 1<< 6;
+
+
+Touch_Screen Tdrv;
 
 
 void Touch_Screen::IO_config()
@@ -46,11 +49,14 @@ void Touch_Screen::IO_config()
     /*Configure p2.11 for interrupt falling edge */
     Chip_GPIOINT_SetIntFalling(LPC_GPIOINT,GPIOINT_PORT2,1<<11);
 
+    /*Configure p2.11 for interrupt rising edge */
+    Chip_GPIOINT_SetIntRising(LPC_GPIOINT,GPIOINT_PORT2,1<<11);
+
     /*Configure p0.21 for interrupt falling edge */
     Chip_GPIOINT_SetIntFalling(LPC_GPIOINT,GPIOINT_PORT0,1<<21);
 }
 
-void Touch_Screen::Init()
+void Touch_Screen::Init(UINT (*event_func)(GX_EVENT *event_ptr))
 {
 
     /* Enable Peripheral Clock*/
@@ -68,6 +74,8 @@ void Touch_Screen::Init()
     /* Enable Peripheral */
     Chip_SSP_Enable(SSPx);
     
+    this->event_func=event_func;
+
 }
 
 void Touch_Screen::get_pos(char coordinate, uint8_t mask)
@@ -89,9 +97,29 @@ void Touch_Screen::power_down()
 {
     CS_DIS
 
-    /* Cleare pending interrupt*/
+    /* Clear pending interrupt*/
     Chip_GPIOINT_ClearIntStatus(LPC_GPIOINT,GPIOINT_PORT2,1<<11);
 }
+
+
+void Touch_Screen::SendEvent(ULONG event_type )
+{
+	/* Load event type */
+	_event.gx_event_type=event_type;
+
+	/* Specify which widget to send the event */
+	_event.gx_event_target = GX_NULL;
+
+	/* copy lcd screen point data*/
+	_event.gx_event_payload.gx_event_pointdata.gx_point_x = 385;//249;
+	_event.gx_event_payload.gx_event_pointdata.gx_point_y = 191; //92;
+
+	_event.gx_event_display_handle = GX_NULL;
+
+	/* Send event */
+    event_func(&_event);
+}
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -102,30 +130,31 @@ CHAR touch_stack[STACK_SIZE]  __attribute__((section(".sram")));
 
 void GPIO_IRQHandler()
 {
-    
-    GX_EVENT event;
-    
+
     if (Chip_GPIOINT_GetStatusFalling(LPC_GPIOINT,GPIOINT_PORT2) & 1<<11)
     {
         /* Clear pending interrupt for port p2.11*/
         Chip_GPIOINT_ClearIntStatus(LPC_GPIOINT,GPIOINT_PORT2,1<<11);
 
         /* Unblock touch thread */
-        Tdrv.int_flag++;
+        Tdrv.EdgeFall = true;
+
+
     }
+    if (Chip_GPIOINT_GetStatusRising(LPC_GPIOINT,GPIOINT_PORT2) & 1<<11)
+	{
+		/* Clear pending interrupt for port p2.11*/
+		Chip_GPIOINT_ClearIntStatus(LPC_GPIOINT,GPIOINT_PORT2,1<<11);
+
+		/* Unblock touch thread */
+		Tdrv.EdgeRise=true;
+
+	}
     else if (Chip_GPIOINT_GetStatusFalling(LPC_GPIOINT,GPIOINT_PORT0) & 1<<21)
     {
         /* Clear pending interrupt for port p0.21*/
         Chip_GPIOINT_ClearIntStatus(LPC_GPIOINT,GPIOINT_PORT0,1<<21);
-        
-        /* Load event type */
-        event.gx_event_type=ok_push;
 
-        /* Specify which widget to send the event */
-        event.gx_event_target = GX_NULL; //(GX_WIDGET *)&main_window;
-                
-        /* Send event */        
-        gx_system_event_send(&event);
     }
 }
 
@@ -135,60 +164,79 @@ void touch_thread_entry(ULONG args)
   UINT status;
   uint8_t filter_samples=0, PD0=0x0;
   float filter_data[2], filter_data_1[2]={0};
-  static float alpha=0.3, pressure;
-  uint16_t rx_plate=805;
+  static float alpha=0.3;
+  UINT event_send = 1;
 
 
   /* Send touch driver to power down */
   Tdrv.get_pos(X_POS,PD0);
   
+  /* Enable Interrupts */
+  EN_INT
+
   while(true)
   {
     
-    /* Enable Interrupts */
-    EN_INT
-
-    /* reset flag and wait for a touch */
-    Tdrv.int_flag=0;
-
-    while(Tdrv.int_flag==0)
+    while(Tdrv.EdgeFall==false and Tdrv.EdgeRise==false)
     {
-        tx_thread_relinquish();
+    	/* Load event type */
+    	tx_thread_relinquish();
+
     }
-
-    /* Disable interrupts */
-    DIS_INT
-
-    /* Keep the adc on between measurements and avoid
-       false interrupts for Pen interrupt pin*/
-    PD0 = 0x0;
     
-    /* take n samples of x and y position*/
-    do 
-    { 
-      /* Read x and y position */
-      Tdrv.get_pos(X_POS,PD0);
-      Tdrv.get_pos(Y_POS,PD0);
+    if(Tdrv.EdgeRise)
+    {
+    	/* Disable interrupts */
+    	DIS_INT
 
-      /* apply low pass filter to x position*/
-      filter_data[X_POS] = alpha*filter_data_1[X_POS] + (1-alpha)*Tdrv.pos[X_POS];
-      filter_data_1[X_POS] = filter_data[X_POS];
+    	Tdrv.SendEvent(GX_EVENT_PEN_UP);
+    	/* Enable Interrupts */
+    	EN_INT
+    	Tdrv.EdgeRise = false;
+    }
+    else if(Tdrv.EdgeFall)
+    {
 
-      /* apply low pass filter to y position*/
-      filter_data[Y_POS] = alpha*filter_data_1[Y_POS] + (1-alpha)*Tdrv.pos[Y_POS];
-      filter_data_1[Y_POS] = filter_data[Y_POS];
+		/* Disable interrupts */
+		DIS_INT
 
-      /* Increment sample counts*/
-      filter_samples++;
-    }while (filter_samples < 5);
+		/* Keep the adc on between measurements and avoid
+		   false interrupts for Pen interrupt pin*/
+		PD0 = 0x0;
 
-    /* update values after filter applied */
-    Tdrv.x_pos=filter_data[X_POS];
-    Tdrv.y_pos=filter_data[Y_POS];
-    
-    /* reset sample count */
-    filter_samples=0;
-        
+		/* take n samples of x and y position*/
+		do
+		{
+		  /* Read x and y position */
+		  Tdrv.get_pos(X_POS,PD0);
+		  Tdrv.get_pos(Y_POS,PD0);
+
+		  /* apply low pass filter to x position*/
+		  filter_data[X_POS] = alpha*filter_data_1[X_POS] + (1-alpha)*Tdrv.pos[X_POS];
+		  filter_data_1[X_POS] = filter_data[X_POS];
+
+		  /* apply low pass filter to y position*/
+		  filter_data[Y_POS] = alpha*filter_data_1[Y_POS] + (1-alpha)*Tdrv.pos[Y_POS];
+		  filter_data_1[Y_POS] = filter_data[Y_POS];
+
+		  /* Increment sample counts*/
+		  filter_samples++;
+		}while (filter_samples < 5);
+
+		/* update values after filter applied */
+		Tdrv.x_pos=filter_data[X_POS];
+		Tdrv.y_pos=filter_data[Y_POS];
+
+		/* reset sample count */
+		filter_samples=0;
+
+		Tdrv.SendEvent(GX_EVENT_PEN_DOWN);
+
+	  }
+
+    /* Enable Interrupts */
+        EN_INT
+      Tdrv.EdgeFall = false;
   }
 }
 

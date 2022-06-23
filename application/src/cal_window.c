@@ -1,5 +1,5 @@
 #include "gx_api.h"
-#include "3dprint_lcd_specifications.h"
+#include "lcd_specifications.h"
 #include "cal_window.h"
 
 UINT Cal_Window_Event_Process(GX_WINDOW *widget, GX_EVENT *event_ptr)

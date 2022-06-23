@@ -9,7 +9,7 @@ export TOOL ?= gnu
 export AR := $(CROSS_COMPILE)ar
 export CFLAGS := -mcpu=cortex-m3 -march=armv7-m -mthumb -O0 \
 		   -fmessage-length=0 -fsigned-char -ffunction-sections \
-		   -fdata-sections -g3 -DCORE_M3 -D__NO_SYSTEM_INIT
+		   -fdata-sections -g3 -DCORE_M3 -D__NO_SYSTEM_INIT -D__STARTUP_CLEAR_BSS_MULTIPLE
 
 LDFLAGS = -mcpu=cortex-m3  \
 		--specs=nosys.specs -Wl,-Map="app.map" -Wl,--gc-sections -static \

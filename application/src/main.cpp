@@ -8,16 +8,19 @@
 #include "main.h"
 
 /* add GUIX generated files*/
-#include "3dprint_lcd_resources.h"
-#include "3dprint_lcd_specifications.h"
+#include "lcd_resources.h"
+#include "lcd_specifications.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+extern ULONG __bss2_start__;
+extern ULONG __bss2_end__;
+
 #define STACK_SIZE (2 * 1024)
 CHAR main_stack[STACK_SIZE];
-CHAR gui_stack[STACK_SIZE]    __attribute__((section(".sram")));
+CHAR gui_stack[STACK_SIZE] __attribute__((section(".sram")));
 
 static void main_thread_entry(ULONG arg);
 static void gui_thread_entry(ULONG args);
@@ -59,16 +62,16 @@ CHAR main_thread_name[] = "main thread";
 const uint32_t OscRateIn = 12000000;
 Memory Sram;
 Display TFT_lcd;
-Touch_Screen Tdrv;
 
 GX_WINDOW_ROOT *root;
 
 int main()
 {
-
+  Memory *test = new Memory();
+  test->Init(tx_thread_sleep);
   Chip_SystemInit();
   Sram.IO_config();
-  TFT_lcd.IO_config();  
+  TFT_lcd.IO_config();
   Tdrv.IO_config();
 
   /* Enter the ThreadX kernel. */
@@ -91,8 +94,9 @@ static void main_thread_entry(ULONG arg)
   UINT i = 0;
 
   Sram.Init(tx_thread_sleep);
+  Sram.Clear(&__bss2_start__, &__bss2_end__);
   TFT_lcd.Init();
-  Tdrv.Init();
+  Tdrv.Init(gx_system_event_send);
   /* Create thread for gui */
   THREAD_CREATE(GUI_THREAD);
 
@@ -123,6 +127,8 @@ static void gui_thread_entry(ULONG args)
 
   gx_studio_named_widget_create((char *)"Cal_Window", (GX_WIDGET *)root, GX_NULL);
   
+  gx_studio_named_widget_create((char *)"info_window", (GX_WIDGET *)root, GX_NULL);
+
   /* Create the screen - attached to root window. */
   gx_studio_named_widget_create((char *)"main_window", (GX_WIDGET *)root, GX_NULL);
 

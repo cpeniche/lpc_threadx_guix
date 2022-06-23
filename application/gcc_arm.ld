@@ -109,18 +109,18 @@ SECTIONS
 	/* To clear multiple BSS sections,
 	 * uncomment .zero.table section and,
 	 * define __STARTUP_CLEAR_BSS_MULTIPLE in startup_ARMCMx.S */
-	/*
+	
 	.zero.table :
 	{
 		. = ALIGN(4);
-		__zero_table_start__ = .;
+		PROVIDE(__zero_table_start__ = .);
 		LONG (__bss_start__)
 		LONG (__bss_end__ - __bss_start__)
-		LONG (__bss2_start__)
-		LONG (__bss2_end__ - __bss2_start__)
+	/*	LONG (__bss2_start__)
+		LONG (__bss2_end__ - __bss2_start__)*/
 		__zero_table_end__ = .;
 	} > FLASH
-	*/
+	
 
 	__etext = .;
 
@@ -162,7 +162,8 @@ SECTIONS
 	{
 		. = ALIGN(4);
 		__bss_start__ = .;
-		*(.bss*)
+		*(EXCLUDE_FILE(*lcd_specifications.o) .bss*)
+/*		*(.bss*)*/		
 		*(COMMON)
 		. = ALIGN(4);
 		__bss_end__ = .;
@@ -197,6 +198,9 @@ SECTIONS
 	
 	.sram :
 	{
-	
+		PROVIDE(__bss2_start__ = .);
+		*(.sram)
+		*lcd_specifications.o(.bss*)
+		PROVIDE(__bss2_end__ = .);
 	}>SD_RAM
 }

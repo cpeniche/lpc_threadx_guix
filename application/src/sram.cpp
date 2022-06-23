@@ -127,5 +127,16 @@ void Memory::Init(unsigned int (*delay)(uint32_t time))
 }
 
 
+void Memory::Clear(uint32_t *start, uint32_t *end)
+{
+	uint32_t *pSrc, *pDest;
+
+	pDest = start;
+
+	for ( ; pDest < end ; ) {
+	    *pDest++ = 0ul;
+	}
+
+}
 
 

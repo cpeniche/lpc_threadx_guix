@@ -317,5 +317,7 @@ void Default_Handler(void) {
 
 void Default_Handler1(void) {
 
-  while(1);
+  static int i=0;
+
+	while(i==0);
 }

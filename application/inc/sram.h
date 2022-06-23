@@ -215,6 +215,7 @@ class Memory
     ~Memory();
     void Init(unsigned int (*delay)(uint32_t time));
     void IO_config();
+    void Clear(uint32_t *start, uint32_t *end);
 };
 
 #endif
