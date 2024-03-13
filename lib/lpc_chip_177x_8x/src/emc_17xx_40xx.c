@@ -301,6 +301,20 @@ void Chip_EMC_Init(uint32_t Enable, uint32_t EndianMode)
 	/* Enable EMC 001 Normal Memory Map, No low power mode */
 	LPC_EMC->CONTROL     = (Enable ? 1 : 0);
 }
+
+
+void Chip_EMC_AddressChip(uint8_t Enable)
+{
+
+	if (!Enable) {
+		LPC_SYSCTL->SCS |= 1 << 0;
+	}
+	else {
+		LPC_SYSCTL->SCS &= ~(1 << 0);
+	}
+}
+
 #endif
+
 
 #endif /* defined(CHIP_LPC177X_8X) || defined(CHIP_LPC40XX) */

@@ -353,6 +353,8 @@ STATIC INLINE void Chip_EMC_SetStaticExtendedWait(uint32_t Wait16Clks)
 
 #endif /* defined(CHIP_LPC177X_8X) || defined(CHIP_LPC40XX) */
 
+
+void Chip_EMC_AddressChip(uint8_t Enable);
 /**
  * @}
  */

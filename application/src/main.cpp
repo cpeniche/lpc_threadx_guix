@@ -1,6 +1,6 @@
 #include "chip.h"
 #include "tx_api.h"
-#include "sram.h"
+#include "sdram.h"
 #include "gx_api.h"
 #include "gx_display.h"
 #include "display.h"
@@ -62,17 +62,17 @@ ULONG class_driver_index;
 UINT status;
 CHAR main_thread_name[] = "main thread";
 const uint32_t OscRateIn = 12000000;
-SRAM_Memory Sram;
+SDRAM_Memory SDram;
 Display TFT_lcd;
 
 GX_WINDOW_ROOT *root;
 
 int main()
 {
-	SRAM_Memory *test = new SRAM_Memory();
-  test->Init(tx_thread_sleep);
+	//SDRAM_Memory *test = new SDRAM_Memory();
+  //test->Init(tx_thread_sleep);
   Chip_SystemInit();
-  Sram.IO_config();
+  SDram.IO_config();
   TFT_lcd.IO_config();
   Tdrv.IO_config();
 
@@ -95,8 +95,8 @@ static void main_thread_entry(ULONG arg)
 
   UINT i = 0;
 
-  Sram.Init(tx_thread_sleep);
-  Sram.Clear(&__bss2_start__, &__bss2_end__);
+  SDram.Init(tx_thread_sleep);
+  SDram.Clear(&__bss2_start__, &__bss2_end__);
   TFT_lcd.Init();
   Tdrv.Init(gx_system_event_send);
   /* Create thread for gui */
@@ -206,7 +206,7 @@ UINT create_button(GX_WINDOW *widget)
 
 UINT multiline_handler(GX_MULTI_LINE_TEXT_INPUT *widget, GX_EVENT *event_ptr)
 {
-
+	return 1;
 
 }
 

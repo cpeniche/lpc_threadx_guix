@@ -1,19 +1,19 @@
 #include "chip.h"
 #include "chip_lpc177x_8x.h"
 #include "emc_17xx_40xx.h"
-#include "sram.h"
+#include "sdram.h"
 #include "tx_api.h"
 
 
-SRAM_Memory::SRAM_Memory(/* args */)
+SDRAM_Memory::SDRAM_Memory(/* args */)
 {
 }
 
-SRAM_Memory::~SRAM_Memory()
+SDRAM_Memory::~SDRAM_Memory()
 {
 }
 
-void SRAM_Memory::IO_config()
+void SDRAM_Memory::IO_config()
 {
   uint32_t index = 0, port = 0, base_addr;
   LPC_IOCON_T base = {0};
@@ -28,7 +28,7 @@ void SRAM_Memory::IO_config()
 
   /* Configure port 3 as EMC data pins*/
   port = 3;
-  for (index = 0; index <= LPC178X_EMC_DATA_PINS; index++)
+  for (index = 0; index < LPC178X_EMC_DATA_PINS; index++)
   {
     base.p[port][index] = (LPC_IOCON_BASE + (port)*0x80 + (index)*4);
     Chip_IOCON_PinMuxSet(&base, port, index, LPC178X_GPIO_EMC_REGVAL);
@@ -36,7 +36,7 @@ void SRAM_Memory::IO_config()
 
   /* Configure port 4 as EMC address pins */
   port = 4;
-  for (index = 0; index <= LPC178X_EMC_ADDR_PINS; index++)
+  for (index = 0; index < LPC178X_EMC_ADDR_PINS; index++)
   {
     base.p[port][index] = (LPC_IOCON_BASE + (port)*0x80 + (index)*4);
     Chip_IOCON_PinMuxSet(&base, port, index, LPC178X_GPIO_EMC_REGVAL);
@@ -44,7 +44,7 @@ void SRAM_Memory::IO_config()
 
 }
 
-void SRAM_Memory::Init(unsigned int (*delay)(uint32_t time))
+void SDRAM_Memory::Init(unsigned int (*delay)(uint32_t time))
 {
 
   uint32_t tmp32;
@@ -127,7 +127,7 @@ void SRAM_Memory::Init(unsigned int (*delay)(uint32_t time))
 }
 
 
-void SRAM_Memory::Clear(uint32_t *start, uint32_t *end)
+void SDRAM_Memory::Clear(uint32_t *start, uint32_t *end)
 {
 	uint32_t *pSrc, *pDest;
 

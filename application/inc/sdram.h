@@ -1,8 +1,8 @@
-#ifndef __SRAM_H__
-#define __SRAM_H__
+#ifndef __SDRAM_H__
+#define __SDRAM_H__
 
 /* EMC data pins (DQ0..DQ31) */
-#define LPC178X_EMC_DATA_PINS 31
+#define LPC178X_EMC_DATA_PINS 32
 
 /* EMC row/column address pins (A0..A11) */
 #define LPC178X_EMC_ADDR_PINS 12
@@ -179,7 +179,7 @@
 #define LPC178X_SCC_BASE		(LPC178X_APB1PERIPH_BASE + 0x0007C000)
 
 
-class SRAM_Memory
+class SDRAM_Memory
 {
   private:
   /* data */
@@ -211,8 +211,8 @@ class SRAM_Memory
     {2, 31, LPC178X_GPIO_EMC_REGVAL},
   };
   public:
-		SRAM_Memory(/* args */);
-    ~SRAM_Memory();
+  	SDRAM_Memory(/* args */);
+    ~SDRAM_Memory();
     void Init(unsigned int (*delay)(uint32_t time));
     void IO_config();
     void Clear(uint32_t *start, uint32_t *end);
