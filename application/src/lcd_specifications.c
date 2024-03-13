@@ -5,8 +5,8 @@
 /*  specification file(s). For more information please refer to the Azure RTOS */
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
-/*  GUIX Studio Revision 6.1.11.0                                              */
-/*  Date (dd.mm.yyyy): 20. 6.2022   Time (hh:mm): 21:56                        */
+/*  GUIX Studio Revision 6.4.0.0                                               */
+/*  Date (dd.mm.yyyy): 28. 2.2024   Time (hh:mm): 23:22                        */
 /*******************************************************************************/
 
 
@@ -22,7 +22,7 @@ MAIN_WINDOW_CONTROL_BLOCK main_window;
 GX_DISPLAY display_control_block;
 GX_WINDOW_ROOT display_root_window;
 GX_CANVAS  display_canvas_control_block;
-ULONG      display_canvas_memory[65280];// __attribute__((section(".sram")));
+ULONG      display_canvas_memory[65280];
 
 extern GX_CONST GX_THEME *display_theme_table[];
 extern GX_CONST GX_STRING *display_language_table[];
@@ -47,20 +47,6 @@ GX_STUDIO_DISPLAY_INFO lcd_display_table[1] =
     GX_SCREEN_ROTATION_NONE                  /* rotation angle                 */
     }
 };
-
-static VOID gx_studio_screen_toggle(GX_WIDGET *target1, GX_WIDGET *target2)
-{
-    GX_WIDGET *parent = target1->gx_widget_parent;
-    if (parent)
-    {
-        gx_widget_detach(target1);
-        gx_widget_attach(parent, target2);
-        if (target1->gx_widget_status & GX_STATUS_STUDIO_CREATED)
-        {
-            gx_widget_delete(target1);
-        }
-    }
-}
 
 static GX_WIDGET *gx_studio_action_target_get(GX_WIDGET *current, GX_CONST GX_STUDIO_ACTION *action)
 {
@@ -245,6 +231,11 @@ UINT gx_studio_auto_event_handler(GX_WIDGET *widget, GX_EVENT *event_ptr, GX_CON
                         gx_widget_detach(target);
                         if (target->gx_widget_status & GX_STATUS_STUDIO_CREATED)
                         {
+                            if (widget == target)
+                            {
+                                widget = GX_NULL;
+                            }
+
                             gx_widget_delete(target);
                         }
                     }
@@ -259,7 +250,17 @@ UINT gx_studio_auto_event_handler(GX_WIDGET *widget, GX_EVENT *event_ptr, GX_CON
                     {
                         target = gx_studio_action_target_get(widget, action);
                     }
-                    gx_studio_screen_toggle(widget, target);
+                    parent = widget->gx_widget_parent;
+                    if (parent)
+                    {
+                        gx_widget_detach(widget);
+                        gx_widget_attach(parent, target);
+                        if (widget->gx_widget_status & GX_STATUS_STUDIO_CREATED)
+                        {
+                            gx_widget_delete(widget);
+                            widget = GX_NULL;
+                        }
+                    }
                     break;
 
                 case GX_ACTION_TYPE_SHOW:
@@ -332,7 +333,7 @@ UINT gx_studio_auto_event_handler(GX_WIDGET *widget, GX_EVENT *event_ptr, GX_CON
         entry++;
     }
 
-    if (record->chain_event_handler)
+    if (widget && record->chain_event_handler)
     {
         status = record->chain_event_handler(widget, event_ptr);
     }
@@ -437,6 +438,151 @@ GX_ICON_PROPERTIES Cal_Window_br_icon_properties =
     GX_PIXELMAP_ID_CALIBRATION_MARK_40X40,   /* normal pixelmap id             */
     GX_PIXELMAP_ID_CALIBRATION_MARK_RED_40X40  /* selected pixelmap id         */
 };
+GX_ICON_PROPERTIES Cal_Window_tl_icon_1_properties =
+{
+    GX_PIXELMAP_ID_CALIBRATION_MARK_40X40,   /* normal pixelmap id             */
+    GX_PIXELMAP_ID_CALIBRATION_MARK_RED_40X40  /* selected pixelmap id         */
+};
+GX_ICON_PROPERTIES Cal_Window_tl_icon_2_properties =
+{
+    GX_PIXELMAP_ID_CALIBRATION_MARK_40X40,   /* normal pixelmap id             */
+    GX_PIXELMAP_ID_CALIBRATION_MARK_RED_40X40  /* selected pixelmap id         */
+};
+GX_ICON_PROPERTIES Cal_Window_tl_icon_3_properties =
+{
+    GX_PIXELMAP_ID_CALIBRATION_MARK_40X40,   /* normal pixelmap id             */
+    GX_PIXELMAP_ID_CALIBRATION_MARK_RED_40X40  /* selected pixelmap id         */
+};
+GX_ICON_PROPERTIES Cal_Window_tl_icon_4_properties =
+{
+    GX_PIXELMAP_ID_CALIBRATION_MARK_40X40,   /* normal pixelmap id             */
+    GX_PIXELMAP_ID_CALIBRATION_MARK_RED_40X40  /* selected pixelmap id         */
+};
+GX_ICON_PROPERTIES Cal_Window_tl_icon_5_properties =
+{
+    GX_PIXELMAP_ID_CALIBRATION_MARK_40X40,   /* normal pixelmap id             */
+    GX_PIXELMAP_ID_CALIBRATION_MARK_RED_40X40  /* selected pixelmap id         */
+};
+
+GX_CONST GX_STUDIO_WIDGET Cal_Window_tl_icon_5_define =
+{
+    "tl_icon_5",
+    GX_TYPE_ICON,                            /* widget type                    */
+    tl_icon_id,                              /* widget id                      */
+    #if defined(GX_WIDGET_USER_DATA)
+    0,                                       /* user data                      */
+    #endif
+    GX_STYLE_BORDER_NONE|GX_STYLE_ENABLED|GX_STYLE_HALIGN_LEFT|GX_STYLE_VALIGN_TOP,   /* style flags */
+    GX_STATUS_ACCEPTS_FOCUS,                 /* status flags                   */
+    sizeof(GX_ICON),                         /* control block size             */
+    GX_COLOR_ID_WIDGET_FILL,                 /* normal color id                */
+    GX_COLOR_ID_SELECTED_FILL,               /* selected color id              */
+    GX_COLOR_ID_DISABLED_FILL,               /* disabled color id              */
+    gx_studio_icon_create,                   /* create function                */
+    GX_NULL,                                 /* drawing function override      */
+    GX_NULL,                                 /* event function override        */
+    {440, 116, 479, 155},                    /* widget size                    */
+    GX_NULL,                                 /* no next widget                 */
+    GX_NULL,                                 /* no child widgets               */ 
+    offsetof(CAL_WINDOW_CONTROL_BLOCK, Cal_Window_tl_icon_5), /* control block */
+    (void *) &Cal_Window_tl_icon_5_properties /* extended properties           */
+};
+
+GX_CONST GX_STUDIO_WIDGET Cal_Window_tl_icon_4_define =
+{
+    "tl_icon_4",
+    GX_TYPE_ICON,                            /* widget type                    */
+    tl_icon_id,                              /* widget id                      */
+    #if defined(GX_WIDGET_USER_DATA)
+    0,                                       /* user data                      */
+    #endif
+    GX_STYLE_BORDER_NONE|GX_STYLE_ENABLED|GX_STYLE_HALIGN_LEFT|GX_STYLE_VALIGN_TOP,   /* style flags */
+    GX_STATUS_ACCEPTS_FOCUS,                 /* status flags                   */
+    sizeof(GX_ICON),                         /* control block size             */
+    GX_COLOR_ID_WIDGET_FILL,                 /* normal color id                */
+    GX_COLOR_ID_SELECTED_FILL,               /* selected color id              */
+    GX_COLOR_ID_DISABLED_FILL,               /* disabled color id              */
+    gx_studio_icon_create,                   /* create function                */
+    GX_NULL,                                 /* drawing function override      */
+    GX_NULL,                                 /* event function override        */
+    {220, 116, 259, 155},                    /* widget size                    */
+    &Cal_Window_tl_icon_5_define,            /* next widget definition         */
+    GX_NULL,                                 /* no child widgets               */ 
+    offsetof(CAL_WINDOW_CONTROL_BLOCK, Cal_Window_tl_icon_4), /* control block */
+    (void *) &Cal_Window_tl_icon_4_properties /* extended properties           */
+};
+
+GX_CONST GX_STUDIO_WIDGET Cal_Window_tl_icon_3_define =
+{
+    "tl_icon_3",
+    GX_TYPE_ICON,                            /* widget type                    */
+    tl_icon_id,                              /* widget id                      */
+    #if defined(GX_WIDGET_USER_DATA)
+    0,                                       /* user data                      */
+    #endif
+    GX_STYLE_BORDER_NONE|GX_STYLE_ENABLED|GX_STYLE_HALIGN_LEFT|GX_STYLE_VALIGN_TOP,   /* style flags */
+    GX_STATUS_ACCEPTS_FOCUS,                 /* status flags                   */
+    sizeof(GX_ICON),                         /* control block size             */
+    GX_COLOR_ID_WIDGET_FILL,                 /* normal color id                */
+    GX_COLOR_ID_SELECTED_FILL,               /* selected color id              */
+    GX_COLOR_ID_DISABLED_FILL,               /* disabled color id              */
+    gx_studio_icon_create,                   /* create function                */
+    GX_NULL,                                 /* drawing function override      */
+    GX_NULL,                                 /* event function override        */
+    {0, 116, 39, 155},                       /* widget size                    */
+    &Cal_Window_tl_icon_4_define,            /* next widget definition         */
+    GX_NULL,                                 /* no child widgets               */ 
+    offsetof(CAL_WINDOW_CONTROL_BLOCK, Cal_Window_tl_icon_3), /* control block */
+    (void *) &Cal_Window_tl_icon_3_properties /* extended properties           */
+};
+
+GX_CONST GX_STUDIO_WIDGET Cal_Window_tl_icon_2_define =
+{
+    "tl_icon_2",
+    GX_TYPE_ICON,                            /* widget type                    */
+    tl_icon_id,                              /* widget id                      */
+    #if defined(GX_WIDGET_USER_DATA)
+    0,                                       /* user data                      */
+    #endif
+    GX_STYLE_BORDER_NONE|GX_STYLE_ENABLED|GX_STYLE_HALIGN_LEFT|GX_STYLE_VALIGN_TOP,   /* style flags */
+    GX_STATUS_ACCEPTS_FOCUS,                 /* status flags                   */
+    sizeof(GX_ICON),                         /* control block size             */
+    GX_COLOR_ID_WIDGET_FILL,                 /* normal color id                */
+    GX_COLOR_ID_SELECTED_FILL,               /* selected color id              */
+    GX_COLOR_ID_DISABLED_FILL,               /* disabled color id              */
+    gx_studio_icon_create,                   /* create function                */
+    GX_NULL,                                 /* drawing function override      */
+    GX_NULL,                                 /* event function override        */
+    {221, 232, 260, 271},                    /* widget size                    */
+    &Cal_Window_tl_icon_3_define,            /* next widget definition         */
+    GX_NULL,                                 /* no child widgets               */ 
+    offsetof(CAL_WINDOW_CONTROL_BLOCK, Cal_Window_tl_icon_2), /* control block */
+    (void *) &Cal_Window_tl_icon_2_properties /* extended properties           */
+};
+
+GX_CONST GX_STUDIO_WIDGET Cal_Window_tl_icon_1_define =
+{
+    "tl_icon_1",
+    GX_TYPE_ICON,                            /* widget type                    */
+    tl_icon_id,                              /* widget id                      */
+    #if defined(GX_WIDGET_USER_DATA)
+    0,                                       /* user data                      */
+    #endif
+    GX_STYLE_BORDER_NONE|GX_STYLE_ENABLED|GX_STYLE_HALIGN_LEFT|GX_STYLE_VALIGN_TOP,   /* style flags */
+    GX_STATUS_ACCEPTS_FOCUS,                 /* status flags                   */
+    sizeof(GX_ICON),                         /* control block size             */
+    GX_COLOR_ID_WIDGET_FILL,                 /* normal color id                */
+    GX_COLOR_ID_SELECTED_FILL,               /* selected color id              */
+    GX_COLOR_ID_DISABLED_FILL,               /* disabled color id              */
+    gx_studio_icon_create,                   /* create function                */
+    GX_NULL,                                 /* drawing function override      */
+    GX_NULL,                                 /* event function override        */
+    {215, 0, 254, 39},                       /* widget size                    */
+    &Cal_Window_tl_icon_2_define,            /* next widget definition         */
+    GX_NULL,                                 /* no child widgets               */ 
+    offsetof(CAL_WINDOW_CONTROL_BLOCK, Cal_Window_tl_icon_1), /* control block */
+    (void *) &Cal_Window_tl_icon_1_properties /* extended properties           */
+};
 
 GX_CONST GX_STUDIO_WIDGET Cal_Window_br_icon_define =
 {
@@ -455,8 +601,8 @@ GX_CONST GX_STUDIO_WIDGET Cal_Window_br_icon_define =
     gx_studio_icon_create,                   /* create function                */
     GX_NULL,                                 /* drawing function override      */
     GX_NULL,                                 /* event function override        */
-    {420, 212, 459, 251},                    /* widget size                    */
-    GX_NULL,                                 /* no next widget                 */
+    {440, 232, 479, 271},                    /* widget size                    */
+    &Cal_Window_tl_icon_1_define,            /* next widget definition         */
     GX_NULL,                                 /* no child widgets               */ 
     offsetof(CAL_WINDOW_CONTROL_BLOCK, Cal_Window_br_icon), /* control block   */
     (void *) &Cal_Window_br_icon_properties  /* extended properties            */
@@ -479,7 +625,7 @@ GX_CONST GX_STUDIO_WIDGET Cal_Window_bl_icon_define =
     gx_studio_icon_create,                   /* create function                */
     GX_NULL,                                 /* drawing function override      */
     GX_NULL,                                 /* event function override        */
-    {20, 212, 59, 251},                      /* widget size                    */
+    {0, 230, 39, 269},                       /* widget size                    */
     &Cal_Window_br_icon_define,              /* next widget definition         */
     GX_NULL,                                 /* no child widgets               */ 
     offsetof(CAL_WINDOW_CONTROL_BLOCK, Cal_Window_bl_icon), /* control block   */
@@ -503,7 +649,7 @@ GX_CONST GX_STUDIO_WIDGET Cal_Window_tr_icon_define =
     gx_studio_icon_create,                   /* create function                */
     GX_NULL,                                 /* drawing function override      */
     GX_NULL,                                 /* event function override        */
-    {420, 20, 459, 59},                      /* widget size                    */
+    {440, 0, 479, 39},                       /* widget size                    */
     &Cal_Window_bl_icon_define,              /* next widget definition         */
     GX_NULL,                                 /* no child widgets               */ 
     offsetof(CAL_WINDOW_CONTROL_BLOCK, Cal_Window_tr_icon), /* control block   */
@@ -527,7 +673,7 @@ GX_CONST GX_STUDIO_WIDGET Cal_Window_tl_icon_define =
     gx_studio_icon_create,                   /* create function                */
     GX_NULL,                                 /* drawing function override      */
     GX_NULL,                                 /* event function override        */
-    {20, 20, 59, 59},                        /* widget size                    */
+    {0, 0, 39, 39},                          /* widget size                    */
     &Cal_Window_tr_icon_define,              /* next widget definition         */
     GX_NULL,                                 /* no child widgets               */ 
     offsetof(CAL_WINDOW_CONTROL_BLOCK, Cal_Window_tl_icon), /* control block   */
@@ -927,7 +1073,7 @@ GX_CONST GX_STUDIO_WIDGET main_window_define =
 {
     "main_window",
     GX_TYPE_WINDOW,                          /* widget type                    */
-    GX_ID_NONE,                              /* widget id                      */
+    ID_MAIN_WINDOW,                          /* widget id                      */
     #if defined(GX_WIDGET_USER_DATA)
     0,                                       /* user data                      */
     #endif

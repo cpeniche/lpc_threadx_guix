@@ -179,7 +179,7 @@
 #define LPC178X_SCC_BASE		(LPC178X_APB1PERIPH_BASE + 0x0007C000)
 
 
-class Memory
+class SRAM_Memory
 {
   private:
   /* data */
@@ -211,8 +211,8 @@ class Memory
     {2, 31, LPC178X_GPIO_EMC_REGVAL},
   };
   public:
-    Memory(/* args */);
-    ~Memory();
+		SRAM_Memory(/* args */);
+    ~SRAM_Memory();
     void Init(unsigned int (*delay)(uint32_t time));
     void IO_config();
     void Clear(uint32_t *start, uint32_t *end);

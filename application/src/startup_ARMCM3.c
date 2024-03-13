@@ -196,7 +196,7 @@ const pFunc __Vectors[] __attribute__ ((section(".vectors"))) = {
   0,                                        /* 35: Reserved                   */
   0,                                        /* 36: Reserved                   */
   0,                                        /* 37: Reserved                   */
-  GPIO_IRQHandler,                          /* 38: Reserved                   */
+  0,      				                    /* 38: Reserved                   */
   0,                                        /* 39: Reserved                   */
   0                                         /* 40: Reserved                   */
 };

@@ -5,8 +5,8 @@
 /*  specification file(s). For more information please refer to the Azure RTOS */
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
-/*  GUIX Studio Revision 6.1.11.0                                              */
-/*  Date (dd.mm.yyyy): 20. 6.2022   Time (hh:mm): 21:56                        */
+/*  GUIX Studio Revision 6.4.0.0                                               */
+/*  Date (dd.mm.yyyy): 28. 2.2024   Time (hh:mm): 23:22                        */
 /*******************************************************************************/
 
 
@@ -28,9 +28,10 @@ extern   "C" {
 #define bl_icon_id 4
 #define br_icon_id 5
 #define done_btn_id 6
-#define nozzle_id 7
-#define bed_id 8
-#define info_btn_id 9
+#define ID_MAIN_WINDOW 7
+#define nozzle_id 8
+#define bed_id 9
+#define info_btn_id 10
 
 
 /* Define animation ids                                                        */
@@ -145,6 +146,11 @@ typedef struct CAL_WINDOW_CONTROL_BLOCK_STRUCT
     GX_ICON Cal_Window_tr_icon;
     GX_ICON Cal_Window_bl_icon;
     GX_ICON Cal_Window_br_icon;
+    GX_ICON Cal_Window_tl_icon_1;
+    GX_ICON Cal_Window_tl_icon_2;
+    GX_ICON Cal_Window_tl_icon_3;
+    GX_ICON Cal_Window_tl_icon_4;
+    GX_ICON Cal_Window_tl_icon_5;
 } CAL_WINDOW_CONTROL_BLOCK;
 
 typedef struct INFO_WINDOW_CONTROL_BLOCK_STRUCT

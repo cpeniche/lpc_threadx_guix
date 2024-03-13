@@ -29,6 +29,8 @@ static void gui_thread_entry(ULONG args);
 TX_THREAD main_thread;
 TX_THREAD gui_thread;
 
+UINT create_button(GX_WINDOW *widget);
+
 APP_THREAD_INFO thread_list[]={
   {
    .thread = &main_thread,
@@ -60,14 +62,14 @@ ULONG class_driver_index;
 UINT status;
 CHAR main_thread_name[] = "main thread";
 const uint32_t OscRateIn = 12000000;
-Memory Sram;
+SRAM_Memory Sram;
 Display TFT_lcd;
 
 GX_WINDOW_ROOT *root;
 
 int main()
 {
-  Memory *test = new Memory();
+	SRAM_Memory *test = new SRAM_Memory();
   test->Init(tx_thread_sleep);
   Chip_SystemInit();
   Sram.IO_config();
@@ -115,6 +117,8 @@ static void main_thread_entry(ULONG arg)
 
 static void gui_thread_entry(ULONG args)
 {
+
+  GX_WIDGET *widget;
   /* Initialize the GUIX library */
   gx_system_initialize();
 
@@ -132,11 +136,78 @@ static void gui_thread_entry(ULONG args)
   /* Create the screen - attached to root window. */
   gx_studio_named_widget_create((char *)"main_window", (GX_WIDGET *)root, GX_NULL);
 
+  //gx_system_widget_find(TEST_WINDOW_ID,GX_SEARCH_DEPTH_INFINITE,&widget);
+
+  //create_button((GX_WINDOW *)widget);
+
   /* Show the root window to make it visible. */
   gx_widget_show(root);
 
   /* Let GUIX run. */
   gx_system_start();
+}
+
+
+GX_TEXT_BUTTON button_widget;
+GX_STRING btn_text={"text",4};
+GX_CONST GX_CHAR *name="text_btn";
+GX_STRING string_text = {"¶",strlen(string_text.gx_string_ptr)};
+
+
+UINT create_button(GX_WINDOW *widget)
+{
+
+  GX_RECTANGLE rectangle;
+  UINT status = GX_SUCCESS;
+
+
+  status=gx_utility_rectangle_define(&rectangle,22, 220, 101, 243);
+
+      /* first create the base pixelmap button */
+  status=gx_text_button_create(&button_widget,
+															 name,
+															 widget,
+															 0/*GX_STRING_ID_STRING_6*/,
+															 GX_STYLE_BORDER_RAISED|GX_STYLE_ENABLED|GX_STYLE_TEXT_CENTER,
+															 0,
+															 &rectangle);
+
+  if(status != GX_SUCCESS)
+	  return status;
+
+  status=gx_widget_fill_color_set((GX_WIDGET *)&button_widget,
+		  GX_COLOR_ID_BTN_LOWER,                   /* normal color id                */
+		  GX_COLOR_ID_BTN_UPPER,             /* selected color id              */
+		  GX_COLOR_ID_DISABLED_FILL);
+  if(status != GX_SUCCESS)
+	  return status;
+
+  status=gx_text_button_font_set(&button_widget,GX_FONT_ID_BUTTON);
+
+  if(status != GX_SUCCESS)
+	  return status;
+
+  status=gx_text_button_text_color_set(&button_widget,GX_COLOR_ID_BTN_TEXT,                    /* normal text color              */
+		  GX_COLOR_ID_BTN_TEXT,                    /* selected text color            */
+		  GX_COLOR_ID_DISABLED_TEXT);
+  if(status != GX_SUCCESS)
+	  return status;
+
+  status = gx_text_button_text_set_ext(&button_widget, &string_text);
+
+  if(status != GX_SUCCESS)
+	  return status;
+
+  status=gx_widget_status_add((GX_WIDGET *)&button_widget,GX_STATUS_ACCEPTS_FOCUS|GX_STATUS_VISIBLE);
+
+  return status;
+
+}
+
+UINT multiline_handler(GX_MULTI_LINE_TEXT_INPUT *widget, GX_EVENT *event_ptr)
+{
+
+
 }
 
 #ifdef __cplusplus

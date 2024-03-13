@@ -5,15 +5,15 @@
 #include "tx_api.h"
 
 
-Memory::Memory(/* args */)
+SRAM_Memory::SRAM_Memory(/* args */)
 {
 }
 
-Memory::~Memory()
+SRAM_Memory::~SRAM_Memory()
 {
 }
 
-void Memory::IO_config()
+void SRAM_Memory::IO_config()
 {
   uint32_t index = 0, port = 0, base_addr;
   LPC_IOCON_T base = {0};
@@ -44,7 +44,7 @@ void Memory::IO_config()
 
 }
 
-void Memory::Init(unsigned int (*delay)(uint32_t time))
+void SRAM_Memory::Init(unsigned int (*delay)(uint32_t time))
 {
 
   uint32_t tmp32;
@@ -127,7 +127,7 @@ void Memory::Init(unsigned int (*delay)(uint32_t time))
 }
 
 
-void Memory::Clear(uint32_t *start, uint32_t *end)
+void SRAM_Memory::Clear(uint32_t *start, uint32_t *end)
 {
 	uint32_t *pSrc, *pDest;
 

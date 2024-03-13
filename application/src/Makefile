@@ -7,3 +7,5 @@ obj-y += lcd_resources.o
 obj-y += lcd_specifications.o
 obj-y += touch_driver.o
 obj-y += cal_window.o
+obj-y += main_window.o
+#obj-y += flash_memory.o

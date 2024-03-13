@@ -4,6 +4,7 @@ MEMORY
   FLASH  (rx)  : ORIGIN = 0x00000000, LENGTH = 0x40000   /* 256k */
   RAM    (rwx) : ORIGIN = 0x20000000, LENGTH = 0x08000   /*  32k */
   SD_RAM (xrw) : ORIGIN = 0xA0000000, LENGTH = 0xFFFFFFF
+  EXT_FLASH (rx)  : ORIGIN = 0x90000000, LENGTH = 0x400000
 }
 
 /* Library configurations */
@@ -70,11 +71,12 @@ SECTIONS
  		*(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
  		*(SORT(.dtors.*))
  		*(.dtors)
-
-		*(.rodata*)
+    *(EXCLUDE_FILE(*lcd_resources.o *lcd_specifications.o) .rodata*)
+	/*  *(.rodata*)*/
 
 		KEEP(*(.eh_frame*))
 	} > FLASH
+	
 
 	.ARM.extab :
 	{
@@ -203,4 +205,14 @@ SECTIONS
 		*lcd_specifications.o(.bss*)
 		PROVIDE(__bss2_end__ = .);
 	}>SD_RAM
+	
+
+	External_Flash 0x90000000 :
+	{
+		
+		*lcd_specifications.o(.rodata*)
+		*lcd_resources.o(.rodata*)
+		*(.rodata*)
+	}
+
 }
