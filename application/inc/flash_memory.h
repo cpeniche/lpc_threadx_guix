@@ -25,7 +25,7 @@ public:
 
 private:
   /* data */
-	const PINMUX_GRP_T pin[4] = {
+	const PINMUX_GRP_T sram_pin[4] = {
 	/* Configure EMC Output Enable */
 	{4, 24, LPC178X_GPIO_EMC_REGVAL},
 	/* Configure EMC write enable (WE) */

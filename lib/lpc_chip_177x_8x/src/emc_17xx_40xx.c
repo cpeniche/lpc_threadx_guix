@@ -204,7 +204,8 @@ void initDynMem(LPC_EMC_T *pEMC, IP_EMC_DYN_CONFIG_T *Dynamic_Config, uint32_t E
  */
 void initStaticMem(LPC_EMC_T *pEMC, IP_EMC_STATIC_CONFIG_T *Static_Config, uint32_t EMC_Clock)
 {
-	LPC_EMC_T *EMC_Reg_add = (LPC_EMC_T *) ((uint32_t) pEMC + ((Static_Config->ChipSelect) << 5));
+	LPC_EMC_T *EMC_Reg_add = (LPC_EMC_T *) ((uint32_t) pEMC + offsetof(LPC_EMC_T,STATICCONFIG0) +
+																				 ((Static_Config->ChipSelect) << 5));
 	EMC_Reg_add->STATICCONFIG0      = Static_Config->Config;
 	EMC_Reg_add->STATICWAITWEN0     = convertTimmingParam(EMC_Clock, Static_Config->WaitWen, 1);
 	EMC_Reg_add->STATICWAITOEN0     = convertTimmingParam(EMC_Clock, Static_Config->WaitOen, 0);

@@ -4,6 +4,7 @@ export CPP := $(CROSS_COMPILE)g++
 export ARCH ?= cortex_m3
 export APPDIR := application
 export TOOL ?= gnu
+export OBJCOPY := $(CROSS_COMPILE)objcopy
 
 
 export AR := $(CROSS_COMPILE)ar
@@ -71,6 +72,9 @@ _dirs := application/ lib/Azure/threadx/ lib/Azure/guix/ lib/lpc_chip_177x_8x/
 built-ins := $(patsubst %/,%/built-in.a, $(_dirs))
 
 PHONY = $(built-ins) FORCE
+
+app.hex : app.elf
+	$(Q)$(OBJCOPY) -O ihex $< $@ 
 
 app.elf : $(built-ins) FORCE
 	$(Q) echo "Linking Application:  $@"

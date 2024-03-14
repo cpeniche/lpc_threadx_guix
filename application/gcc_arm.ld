@@ -71,6 +71,7 @@ SECTIONS
  		*(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
  		*(SORT(.dtors.*))
  		*(.dtors)
+ 		*main.o(.rodata*)
     *(EXCLUDE_FILE(*lcd_resources.o *lcd_specifications.o) .rodata*)
 	/*  *(.rodata*)*/
 
@@ -198,7 +199,7 @@ SECTIONS
 	/* Check if data + heap + stack exceeds RAM limit */
 	ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")
 	
-	.sram :
+	.sram (NOLOAD):
 	{
 		PROVIDE(__bss2_start__ = .);
 		*(.sram)
@@ -207,12 +208,12 @@ SECTIONS
 	}>SD_RAM
 	
 
-	External_Flash 0x90000000 :
+	External_Flash 0x90000000:
 	{
 		
-		*lcd_specifications.o(.rodata*)
-		*lcd_resources.o(.rodata*)
-		*(.rodata*)
+  	*lcd_specifications.o(.rodata*)
+		*lcd_resources.o(.rodata*)		
+		
 	}
 
 }

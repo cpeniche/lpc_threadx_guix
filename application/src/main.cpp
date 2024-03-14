@@ -6,6 +6,7 @@
 #include "display.h"
 #include "touch_driver.h"
 #include "main.h"
+#include "flash_memory.h"
 
 /* add GUIX generated files*/
 #include "lcd_resources.h"
@@ -63,6 +64,7 @@ UINT status;
 CHAR main_thread_name[] = "main thread";
 const uint32_t OscRateIn = 12000000;
 SDRAM_Memory SDram;
+FLASH_MEMORY ExtFlash;
 Display TFT_lcd;
 
 GX_WINDOW_ROOT *root;
@@ -73,6 +75,7 @@ int main()
   //test->Init(tx_thread_sleep);
   Chip_SystemInit();
   SDram.IO_config();
+  ExtFlash.IO_Config();
   TFT_lcd.IO_config();
   Tdrv.IO_config();
 
@@ -97,6 +100,7 @@ static void main_thread_entry(ULONG arg)
 
   SDram.Init(tx_thread_sleep);
   SDram.Clear(&__bss2_start__, &__bss2_end__);
+  ExtFlash.Init();
   TFT_lcd.Init();
   Tdrv.Init(gx_system_event_send);
   /* Create thread for gui */

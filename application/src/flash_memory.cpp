@@ -18,12 +18,12 @@ void FLASH_MEMORY::IO_Config()
 	LPC_IOCON_T base = {0};
 
 	/* Configure pins as table pin[] */
-	for (index = 0; index < (sizeof(pin) / sizeof(PINMUX_GRP_T)); index++)
+	for (index = 0; index < (sizeof(sram_pin) / sizeof(PINMUX_GRP_T)); index++)
 	{
-	base.p[pin[index].pingrp][pin[index].pinnum] = (LPC_IOCON_BASE + (pin[index].pingrp) * 0x80 + (pin[index].pinnum) * 4);
+	base.p[sram_pin[index].pingrp][sram_pin[index].pinnum] = (LPC_IOCON_BASE + (sram_pin[index].pingrp) * 0x80 + (sram_pin[index].pinnum) * 4);
 	}
 
-	Chip_IOCON_SetPinMuxing(&base, pin, sizeof(pin) / sizeof(PINMUX_GRP_T));
+	Chip_IOCON_SetPinMuxing(&base, sram_pin, sizeof(sram_pin) / sizeof(PINMUX_GRP_T));
 
 	/* Configure port 3 as EMC data pins*/
 	port = 3;
