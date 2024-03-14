@@ -27,7 +27,7 @@ void FLASH_MEMORY::IO_Config()
 
 	/* Configure port 3 as EMC data pins*/
 	port = 3;
-	for (index = 0; index <= LPC178X_SRAM_DATA_PINS; index++)
+	for (index = 0; index < LPC178X_SRAM_DATA_PINS; index++)
 	{
 		base.p[port][index] = (LPC_IOCON_BASE + (port)*0x80 + (index)*4);
 		Chip_IOCON_PinMuxSet(&base, port, index, LPC178X_GPIO_EMC_REGVAL);

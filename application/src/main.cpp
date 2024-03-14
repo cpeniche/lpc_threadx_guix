@@ -97,9 +97,11 @@ static void main_thread_entry(ULONG arg)
 {
 
   UINT i = 0;
+  UINT data[10]={0};
 
   SDram.Init(tx_thread_sleep);
-  SDram.Clear(&__bss2_start__, &__bss2_end__);
+  //SDram.Clear(&__bss2_start__, &__bss2_end__);
+  SDram.Clear((uint32_t *)0xa0000000,(uint32_t *)0xa0081648);
   ExtFlash.Init();
   TFT_lcd.Init();
   Tdrv.Init(gx_system_event_send);
@@ -112,6 +114,12 @@ static void main_thread_entry(ULONG arg)
   tx_thread_resume(thread_list[GUI_THREAD].thread);
   tx_thread_resume(thread_list[TOUCH_THREAD].thread);
   
+  for (i=0;i<10;i++)
+  	data[i] = *((UINT *)(0x90000000+i));
+
+  for (i=0;i<10;i++)
+    	data[i] = *((UINT *)(0x90000000+(i*2)));
+
   while(true)
   {
     tx_thread_relinquish();

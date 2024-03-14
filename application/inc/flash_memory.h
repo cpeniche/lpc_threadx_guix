@@ -41,6 +41,10 @@ private:
 	  .ChipSelect=1,
 		.Config= EMC_STATIC_CONFIG_MEM_WIDTH_16| EMC_STATIC_CONFIG_BLS_HIGH \
 		         |EMC_STATIC_CONFIG_EW_DISABLE,
+    .WaitRd = 575,
+		.WaitPage = 575,
+	  .WaitWr = 575,
+		.WaitTurn = 278,
 
 	};
    IP_EMC_STATIC_CONFIG_T *get_flash_config();
