@@ -71,8 +71,7 @@ GX_WINDOW_ROOT *root;
 
 int main()
 {
-	//SDRAM_Memory *test = new SDRAM_Memory();
-  //test->Init(tx_thread_sleep);
+
   Chip_SystemInit();
   SDram.IO_config();
   ExtFlash.IO_Config();
@@ -114,12 +113,6 @@ static void main_thread_entry(ULONG arg)
   tx_thread_resume(thread_list[GUI_THREAD].thread);
   tx_thread_resume(thread_list[TOUCH_THREAD].thread);
   
-  for (i=0;i<10;i++)
-  	data[i] = *((UINT *)(0x90000000+i));
-
-  for (i=0;i<10;i++)
-    	data[i] = *((UINT *)(0x90000000+(i*2)));
-
   while(true)
   {
     tx_thread_relinquish();
@@ -147,10 +140,6 @@ static void gui_thread_entry(ULONG args)
 
   /* Create the screen - attached to root window. */
   gx_studio_named_widget_create((char *)"main_window", (GX_WIDGET *)root, GX_NULL);
-
-  //gx_system_widget_find(TEST_WINDOW_ID,GX_SEARCH_DEPTH_INFINITE,&widget);
-
-  //create_button((GX_WINDOW *)widget);
 
   /* Show the root window to make it visible. */
   gx_widget_show(root);

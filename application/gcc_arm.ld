@@ -208,7 +208,7 @@ SECTIONS
 	}>SD_RAM
 	
 
-	External_Flash 0x90000000 (NOLOAD): ALIGN(0x10)
+	External_Flash 0x90000000 : ALIGN(0x10)
 	{
 		
   	*lcd_specifications.o(.rodata*)
